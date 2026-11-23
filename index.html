@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>《神奇的力》互動學習系統 - GO3 原型 v2</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <style>
     body { font-family: 'Inter', 'Noto Sans TC', sans-serif; background-color: #EBF5FF; color: #0F172A; }
-    .btn-action { transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease; }
+    .btn-action { transition: transform 0.15s ease, background-color 0.15s ease; cursor: pointer; }
     .btn-action:active { transform: scale(0.97); }
     @keyframes floatSlow { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
     .animate-float { animation: floatSlow 3s ease-in-out infinite; }
@@ -20,15 +18,13 @@
 
   <header class="bg-white/90 backdrop-blur border-b border-sky-200 sticky top-0 z-30 shadow-sm">
     <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-      <button onclick="navigateTo('home')" class="flex items-center gap-3 text-left group focus:outline-none">
+      <button type="button" onclick="navigateTo('home')" class="flex items-center gap-3 text-left group focus:outline-none">
         <div class="w-10 h-10 rounded-xl bg-sky-100 border border-sky-300 flex items-center justify-center shadow-inner group-hover:bg-sky-200 transition">
           <svg class="w-7 h-7" viewBox="0 0 64 64" fill="none">
             <ellipse cx="32" cy="32" rx="26" ry="10" transform="rotate(-30 32 32)" stroke="#475569" stroke-width="3.5"/>
             <ellipse cx="32" cy="32" rx="26" ry="10" transform="rotate(30 32 32)" stroke="#475569" stroke-width="3.5"/>
             <ellipse cx="32" cy="32" rx="26" ry="10" stroke="#475569" stroke-width="3.5"/>
-            <circle cx="32" cy="32" r="8" fill="#EF4444"/>
-            <circle cx="14" cy="18" r="4.5" fill="#F59E0B"/>
-            <circle cx="50" cy="46" r="4.5" fill="#3B82F6"/>
+            <circle cx="32" cy="32" r="8" fill="#EF4444"/><circle cx="14" cy="18" r="4.5" fill="#F59E0B"/><circle cx="50" cy="46" r="4.5" fill="#3B82F6"/>
           </svg>
         </div>
         <div>
@@ -39,7 +35,6 @@
           <p class="text-xs text-slate-500">互動學習系統</p>
         </div>
       </button>
-
       <div class="flex items-center gap-2 sm:gap-3">
         <div class="hidden sm:flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-xl text-xs font-bold">
           <span id="nav-badge-u1" class="px-2 py-0.5 rounded-lg bg-slate-200 text-slate-600">1. 力的種類</span>
@@ -48,9 +43,7 @@
           <span class="text-slate-400">→</span>
           <span id="nav-badge-u3" class="px-2 py-0.5 rounded-lg bg-slate-200 text-slate-600">3. 互動遊戲</span>
         </div>
-        <button onclick="toggleFlowModal(true)" class="btn-action px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs sm:text-sm font-bold shadow">
-          系統流程
-        </button>
+        <button type="button" onclick="toggleFlowModal(true)" class="btn-action px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs sm:text-sm font-bold shadow">系統流程</button>
       </div>
     </div>
   </header>
@@ -72,7 +65,7 @@
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-black text-slate-900">《神奇的力》系統流程狀態</h3>
-        <button onclick="toggleFlowModal(false)" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">關閉</button>
+        <button type="button" onclick="toggleFlowModal(false)" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">關閉</button>
       </div>
       <div id="flow-modal-body" class="space-y-3 text-sm"></div>
     </div>
@@ -86,774 +79,375 @@
       u1: { step: 'intro', answers: { spring: '', friction: '', magnet: '', gravity: '' }, feedback: null },
       u2: { step: 'concept', frictionResistance: 50, materialName: '抹布（中等粗糙）', selectedDir: '', feedback: null },
       u3: {
-        step: 'task1',
-        task1Selections: { down: '', left: '', right: '', up: '' },
-        task1Feedback: null,
+        step: 'task1', task1Selections: { down: '', left: '', right: '', up: '' }, task1Feedback: null,
         task2: { prediction: '', force: 60, frictionResistance: 20, materialName: 'PP板（光滑）', observed: false, resultText: '' },
-        quizAnswers: {},
-        quizFeedback: null
+        quizAnswers: {}, quizFeedback: null
       }
     };
 
     let activeAnimFrame = null;
-    function stopCanvasAnim() {
-      if (activeAnimFrame) { cancelAnimationFrame(activeAnimFrame); activeAnimFrame = null; }
-    }
+    function stopCanvasAnim() { if (activeAnimFrame) { cancelAnimationFrame(activeAnimFrame); activeAnimFrame = null; } }
 
     function navigateTo(view) {
-      stopCanvasAnim();
-      appState.currentView = view;
-      updateTopBadges();
-      renderApp();
+      stopCanvasAnim(); appState.currentView = view; updateTopBadges(); renderApp();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function updateTopBadges() {
-      const b1 = document.getElementById('nav-badge-u1');
-      const b2 = document.getElementById('nav-badge-u2');
-      const b3 = document.getElementById('nav-badge-u3');
+      const b1 = document.getElementById('nav-badge-u1'), b2 = document.getElementById('nav-badge-u2'), b3 = document.getElementById('nav-badge-u3');
       b1.className = appState.completed.unit1 ? 'px-2 py-0.5 rounded-lg bg-rose-500 text-white' : 'px-2 py-0.5 rounded-lg bg-slate-200 text-slate-600';
       b2.className = appState.completed.unit2 ? 'px-2 py-0.5 rounded-lg bg-sky-600 text-white' : 'px-2 py-0.5 rounded-lg bg-slate-200 text-slate-600';
       b3.className = appState.completed.unit3 ? 'px-2 py-0.5 rounded-lg bg-emerald-600 text-white' : 'px-2 py-0.5 rounded-lg bg-slate-200 text-slate-600';
     }
 
     function toggleFlowModal(show) {
-      const modal = document.getElementById('flow-modal');
-      const body = document.getElementById('flow-modal-body');
+      const modal = document.getElementById('flow-modal'), body = document.getElementById('flow-modal-body');
       if (show) {
         const allDone = appState.completed.unit1 && appState.completed.unit2 && appState.completed.unit3;
         body.innerHTML = `
           <div class="p-3 rounded-xl bg-sky-50 border border-sky-200 font-bold text-sky-900">起點：開啟「神奇的力」學習系統 → 首頁選擇單元</div>
           <div class="grid grid-cols-1 gap-2">
-            <div class="p-3 rounded-xl border ${appState.completed.unit1 ? 'bg-rose-50 border-rose-300' : 'bg-slate-50 border-slate-200'} flex justify-between items-center">
-              <span class="font-bold">一、力的種類介紹</span>
-              <span class="text-xs font-black px-2.5 py-1 rounded-lg ${appState.completed.unit1 ? 'bg-rose-500 text-white' : 'bg-slate-200 text-slate-600'}">${appState.completed.unit1 ? '已完成' : '未完成'}</span>
-            </div>
-            <div class="p-3 rounded-xl border ${appState.completed.unit2 ? 'bg-sky-50 border-sky-300' : 'bg-slate-50 border-slate-200'} flex justify-between items-center">
-              <span class="font-bold">二、摩擦力登場</span>
-              <span class="text-xs font-black px-2.5 py-1 rounded-lg ${appState.completed.unit2 ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-600'}">${appState.completed.unit2 ? '已完成' : '未完成'}</span>
-            </div>
-            <div class="p-3 rounded-xl border ${appState.completed.unit3 ? 'bg-emerald-50 border-emerald-300' : 'bg-slate-50 border-slate-200'} flex justify-between items-center">
-              <span class="font-bold">三、動手操作（互動遊戲）</span>
-              <span class="text-xs font-black px-2.5 py-1 rounded-lg ${appState.completed.unit3 ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'}">${appState.completed.unit3 ? '已完成' : '未完成'}</span>
-            </div>
+            <div class="p-3 rounded-xl border ${appState.completed.unit1 ? 'bg-rose-50 border-rose-300' : 'bg-slate-50 border-slate-200'} flex justify-between items-center"><span class="font-bold">一、力的種類介紹</span><span class="text-xs font-black px-2.5 py-1 rounded-lg ${appState.completed.unit1 ? 'bg-rose-500 text-white' : 'bg-slate-200 text-slate-600'}">${appState.completed.unit1 ? '已完成' : '未完成'}</span></div>
+            <div class="p-3 rounded-xl border ${appState.completed.unit2 ? 'bg-sky-50 border-sky-300' : 'bg-slate-50 border-slate-200'} flex justify-between items-center"><span class="font-bold">二、摩擦力登場</span><span class="text-xs font-black px-2.5 py-1 rounded-lg ${appState.completed.unit2 ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-600'}">${appState.completed.unit2 ? '已完成' : '未完成'}</span></div>
+            <div class="p-3 rounded-xl border ${appState.completed.unit3 ? 'bg-emerald-50 border-emerald-300' : 'bg-slate-50 border-slate-200'} flex justify-between items-center"><span class="font-bold">三、動手操作（互動遊戲）</span><span class="text-xs font-black px-2.5 py-1 rounded-lg ${appState.completed.unit3 ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'}">${appState.completed.unit3 ? '已完成' : '未完成'}</span></div>
           </div>
-          <div class="p-3 rounded-xl border ${allDone ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-slate-100 border-slate-200 text-slate-600'} font-bold">
-            條件判斷（三個單元是否皆完成？）：${allDone ? '是 → 可領取「力學小達人」勳章！' : '否 → 返回首頁繼續完成單元'}
-          </div>
-        `;
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
+          <div class="p-3 rounded-xl border ${allDone ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-slate-100 border-slate-200 text-slate-600'} font-bold">條件判斷（三個單元是否皆完成？）：${allDone ? '是 → 可領取「力學小達人」勳章！' : '否 → 返回首頁繼續完成單元'}</div>`;
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+      } else { modal.classList.add('hidden'); modal.classList.remove('flex'); }
     }
 
     function renderApp() {
       const main = document.getElementById('app-main');
-      switch (appState.currentView) {
-        case 'home': main.innerHTML = renderHomeView(); break;
-        case 'unit1': main.innerHTML = renderUnit1View(); break;
-        case 'unit2':
-          main.innerHTML = renderUnit2View();
-          if (appState.u2.step === 'sim') initUnit2Canvas();
-          break;
-        case 'unit3':
-          main.innerHTML = renderUnit3View();
-          if (appState.u3.step === 'task2') initUnit3Task2Canvas();
-          break;
-        case 'result': main.innerHTML = renderResultView(); break;
-      }
+      if (appState.currentView === 'home') main.innerHTML = renderHomeView();
+      else if (appState.currentView === 'unit1') main.innerHTML = renderUnit1View();
+      else if (appState.currentView === 'unit2') { main.innerHTML = renderUnit2View(); if (appState.u2.step === 'sim') initUnit2Canvas(); }
+      else if (appState.currentView === 'unit3') { main.innerHTML = renderUnit3View(); if (appState.u3.step === 'task2') initUnit3Task2Canvas(); }
+      else if (appState.currentView === 'result') main.innerHTML = renderResultView();
     }
 
     function renderHomeView() {
-      const { unit1, unit2, unit3 } = appState.completed;
-      const allDone = unit1 && unit2 && unit3;
-      return `
-        <div class="space-y-6">
-          <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-sky-200 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="space-y-3 max-w-xl">
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-bold">
-                <span>視覺化力學學習</span><span>•</span><span>動態向量箭頭</span>
-              </div>
-              <h1 class="text-2xl sm:text-3xl font-black text-slate-900">歡迎來到《神奇的力》</h1>
-              <p class="text-slate-600 text-sm sm:text-base leading-relaxed">力無法直接看見！結合「動物爬樹的秘密」生活情境與動態向量箭頭，一起觀察力的種類、方向與摩擦力變化。</p>
-              <div class="pt-1 flex flex-wrap gap-2">
-                <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold">1. 具象化向量箭頭</span>
-                <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold">2. 接觸面材質實驗</span>
-                <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold">3. 任務化受力標示</span>
-              </div>
+      const { unit1, unit2, unit3 } = appState.completed, allDone = unit1 && unit2 && unit3;
+      return `<div class="space-y-6">
+        <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-sky-200 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="space-y-3 max-w-xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-bold"><span>視覺化力學學習</span><span>•</span><span>動態向量箭頭</span></div>
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-900">歡迎來到《神奇的力》</h1>
+            <p class="text-slate-600 text-sm sm:text-base leading-relaxed">力無法直接看見！結合「動物爬樹的秘密」生活情境與動態向量箭頭，一起觀察力的種類、方向與摩擦力變化。</p>
+            <div class="pt-1 flex flex-wrap gap-2">
+              <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold">1. 具象化向量箭頭</span>
+              <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold">2. 接觸面材質實驗</span>
+              <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold">3. 任務化受力標示</span>
             </div>
-            <div class="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center shrink-0 animate-float">
-              <svg class="w-28 h-28" viewBox="0 0 120 120" fill="none">
-                <path d="M22 45 V75 M14 67 L22 76 L30 67" stroke="#EF4444" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M98 40 V70 M90 62 L98 71 L106 62" stroke="#EF4444" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                <line x1="48" y1="12" x2="48" y2="28" stroke="#0F172A" stroke-width="3" stroke-linecap="round"/>
-                <line x1="60" y1="8" x2="60" y2="24" stroke="#0F172A" stroke-width="3" stroke-linecap="round"/>
-                <line x1="72" y1="14" x2="72" y2="30" stroke="#0F172A" stroke-width="3" stroke-linecap="round"/>
-                <path d="M60 36 C50 32, 42 40, 44 52 C46 62, 54 66, 60 63 C66 66, 74 62, 76 52 C78 40, 70 32, 60 36 Z" fill="#F87171" stroke="#0F172A" stroke-width="3"/>
-                <path d="M60 35 L62 27" stroke="#78350F" stroke-width="3" stroke-linecap="round"/>
-                <ellipse cx="67" cy="29" rx="5" ry="2.5" transform="rotate(-20 67 29)" fill="#4ADE80" stroke="#0F172A" stroke-width="2"/>
-                <path d="M20 105 A45 45 0 0 1 100 105" fill="#60A5FA" stroke="#0F172A" stroke-width="3"/>
-                <path d="M45 92 Q55 96 52 105 L35 105 Q38 95 45 92 Z" fill="#86EFAC"/>
-                <path d="M72 88 Q82 94 78 105 L65 105 Q66 93 72 88 Z" fill="#86EFAC"/>
-              </svg>
-            </div>
-          </section>
-
-          <section>
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="text-lg font-black text-slate-900">請選擇學習單元</h2>
-              <span class="text-xs font-bold text-slate-500">完成進度：${[unit1, unit2, unit3].filter(Boolean).length} / 3 單元</span>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div class="bg-white rounded-2xl p-5 border-2 ${unit1 ? 'border-rose-400' : 'border-slate-200'} shadow-sm flex flex-col justify-between">
-                <div>
-                  <div class="flex items-center justify-between mb-3">
-                    <span class="px-3 py-1 rounded-xl bg-rose-500 text-white text-xs font-black">一、力的種類介紹</span>
-                    <span class="text-xs font-bold ${unit1 ? 'text-rose-600' : 'text-slate-400'}">${unit1 ? '✓ 已完成' : '未完成'}</span>
-                  </div>
-                  <h3 class="text-lg font-extrabold text-slate-900 mb-1">接觸力與非接觸力</h3>
-                  <p class="text-sm text-slate-600 mb-4">認識碰觸才有效的力與隔空作用的力，並完成分類小測試。</p>
-                </div>
-                <button onclick="startUnit1()" class="btn-action w-full py-3 px-4 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm shadow">${unit1 ? '再次複習' : '進入單元一'}</button>
-              </div>
-
-              <div class="bg-white rounded-2xl p-5 border-2 ${unit2 ? 'border-sky-500' : 'border-slate-200'} shadow-sm flex flex-col justify-between">
-                <div>
-                  <div class="flex items-center justify-between mb-3">
-                    <span class="px-3 py-1 rounded-xl bg-sky-600 text-white text-xs font-black">二、摩擦力登場</span>
-                    <span class="text-xs font-bold ${unit2 ? 'text-sky-600' : 'text-slate-400'}">${unit2 ? '✓ 已完成' : '未完成'}</span>
-                  </div>
-                  <h3 class="text-lg font-extrabold text-slate-900 mb-1">接觸面材質與運動方向</h3>
-                  <p class="text-sm text-slate-600 mb-4">切換不同材質地板觀察滑行距離，並挑戰摩擦力方向判斷。</p>
-                </div>
-                <button onclick="startUnit2()" class="btn-action w-full py-3 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm shadow">${unit2 ? '再次複習' : '進入單元二'}</button>
-              </div>
-
-              <div class="bg-white rounded-2xl p-5 border-2 ${unit3 ? 'border-emerald-500' : 'border-slate-200'} shadow-sm flex flex-col justify-between">
-                <div>
-                  <div class="flex items-center justify-between mb-3">
-                    <span class="px-3 py-1 rounded-xl bg-emerald-600 text-white text-xs font-black">三、動手操作</span>
-                    <span class="text-xs font-bold ${unit3 ? 'text-emerald-600' : 'text-slate-400'}">${unit3 ? '✓ 已完成' : '未完成'}</span>
-                  </div>
-                  <h3 class="text-lg font-extrabold text-slate-900 mb-1">互動遊戲與迷思挑戰</h3>
-                  <p class="text-sm text-slate-600 mb-4">標示木塊受力、調整施力（gw）與接觸面材質，完成錯誤概念挑戰。</p>
-                </div>
-                <button onclick="startUnit3()" class="btn-action w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow">${unit3 ? '再次挑戰' : '進入單元三'}</button>
-              </div>
-            </div>
-          </section>
-
-          <section class="bg-white rounded-2xl p-5 border ${allDone ? 'border-amber-400 bg-amber-50/60' : 'border-slate-200'} flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-2xl ${allDone ? 'bg-amber-400 text-white' : 'bg-slate-200 text-slate-500'} flex items-center justify-center font-black text-xl shrink-0">★</div>
-              <div>
-                <h3 class="font-black text-slate-900">${allDone ? '恭喜！三個單元皆已完成！' : '完成三個單元即可解鎖「力學小達人」勳章'}</h3>
-                <p class="text-xs sm:text-sm text-slate-600">${allDone ? '點擊右側按鈕彙整學習歷程並領取結果頁勳章。' : '目前尚有單元未完成，請先點選上方單元進行學習。'}</p>
-              </div>
-            </div>
-            <button onclick="${allDone ? "navigateTo('result')" : "showHomeIncompleteHint()"}" class="btn-action px-6 py-3 rounded-xl font-black text-sm shrink-0 ${allDone ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-md' : 'bg-slate-200 text-slate-500 cursor-pointer'}">
-              ${allDone ? '查看結果與領取勳章 →' : '尚未解鎖勳章'}
-            </button>
-          </section>
-          <div id="home-hint-box" class="hidden p-3 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 text-sm font-bold text-center">
-            流程提示：三個單元尚未全部完成，請先完成所有標示「未完成」的單元！
           </div>
-        </div>
-      `;
-    }
-
-    function showHomeIncompleteHint() {
-      const box = document.getElementById('home-hint-box');
-      if (box) box.classList.remove('hidden');
+          <div class="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center shrink-0 animate-float">
+            <svg class="w-28 h-28" viewBox="0 0 120 120" fill="none">
+              <path d="M22 45 V75 M14 67 L22 76 L30 67" stroke="#EF4444" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M98 40 V70 M90 62 L98 71 L106 62" stroke="#EF4444" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="48" y1="12" x2="48" y2="28" stroke="#0F172A" stroke-width="3" stroke-linecap="round"/><line x1="60" y1="8" x2="60" y2="24" stroke="#0F172A" stroke-width="3" stroke-linecap="round"/><line x1="72" y1="14" x2="72" y2="30" stroke="#0F172A" stroke-width="3" stroke-linecap="round"/>
+              <path d="M60 36 C50 32, 42 40, 44 52 C46 62, 54 66, 60 63 C66 66, 74 62, 76 52 C78 40, 70 32, 60 36 Z" fill="#F87171" stroke="#0F172A" stroke-width="3"/>
+              <path d="M60 35 L62 27" stroke="#78350F" stroke-width="3" stroke-linecap="round"/><ellipse cx="67" cy="29" rx="5" ry="2.5" transform="rotate(-20 67 29)" fill="#4ADE80" stroke="#0F172A" stroke-width="2"/>
+              <path d="M20 105 A45 45 0 0 1 100 105" fill="#60A5FA" stroke="#0F172A" stroke-width="3"/>
+              <path d="M45 92 Q55 96 52 105 L35 105 Q38 95 45 92 Z" fill="#86EFAC"/><path d="M72 88 Q82 94 78 105 L65 105 Q66 93 72 88 Z" fill="#86EFAC"/>
+            </svg>
+          </div>
+        </section>
+        <section>
+          <div class="flex items-center justify-between mb-3"><h2 class="text-lg font-black text-slate-900">請選擇學習單元</h2><span class="text-xs font-bold text-slate-500">完成進度：${[unit1, unit2, unit3].filter(Boolean).length} / 3 單元</span></div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-2xl p-5 border-2 ${unit1 ? 'border-rose-400' : 'border-slate-200'} shadow-sm flex flex-col justify-between">
+              <div><div class="flex items-center justify-between mb-3"><span class="px-3 py-1 rounded-xl bg-rose-500 text-white text-xs font-black">一、力的種類介紹</span><span class="text-xs font-bold ${unit1 ? 'text-rose-600' : 'text-slate-400'}">${unit1 ? '✓ 已完成' : '未完成'}</span></div><h3 class="text-lg font-extrabold text-slate-900 mb-1">接觸力與非接觸力</h3><p class="text-sm text-slate-600 mb-4">認識碰觸才有效的力與隔空作用的力，並完成分類小測試。</p></div>
+              <button type="button" onclick="startUnit1()" class="btn-action w-full py-3 px-4 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm shadow">${unit1 ? '再次複習' : '進入單元一'}</button>
+            </div>
+            <div class="bg-white rounded-2xl p-5 border-2 ${unit2 ? 'border-sky-500' : 'border-slate-200'} shadow-sm flex flex-col justify-between">
+              <div><div class="flex items-center justify-between mb-3"><span class="px-3 py-1 rounded-xl bg-sky-600 text-white text-xs font-black">二、摩擦力登場</span><span class="text-xs font-bold ${unit2 ? 'text-sky-600' : 'text-slate-400'}">${unit2 ? '✓ 已完成' : '未完成'}</span></div><h3 class="text-lg font-extrabold text-slate-900 mb-1">接觸面材質與運動方向</h3><p class="text-sm text-slate-600 mb-4">切換不同材質地板觀察滑行距離，並挑戰摩擦力方向判斷。</p></div>
+              <button type="button" onclick="startUnit2()" class="btn-action w-full py-3 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm shadow">${unit2 ? '再次複習' : '進入單元二'}</button>
+            </div>
+            <div class="bg-white rounded-2xl p-5 border-2 ${unit3 ? 'border-emerald-500' : 'border-slate-200'} shadow-sm flex flex-col justify-between">
+              <div><div class="flex items-center justify-between mb-3"><span class="px-3 py-1 rounded-xl bg-emerald-600 text-white text-xs font-black">三、動手操作</span><span class="text-xs font-bold ${unit3 ? 'text-emerald-600' : 'text-slate-400'}">${unit3 ? '✓ 已完成' : '未完成'}</span></div><h3 class="text-lg font-extrabold text-slate-900 mb-1">互動遊戲與迷思挑戰</h3><p class="text-sm text-slate-600 mb-4">標示木塊受力、調整施力（gw）與接觸面材質，完成錯誤概念挑戰。</p></div>
+              <button type="button" onclick="startUnit3()" class="btn-action w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow">${unit3 ? '再次挑戰' : '進入單元三'}</button>
+            </div>
+          </div>
+        </section>
+        <section class="bg-white rounded-2xl p-5 border ${allDone ? 'border-amber-400 bg-amber-50/60' : 'border-slate-200'} flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl ${allDone ? 'bg-amber-400 text-white' : 'bg-slate-200 text-slate-500'} flex items-center justify-center font-black text-xl shrink-0">★</div>
+            <div><h3 class="font-black text-slate-900">${allDone ? '恭喜！三個單元皆已完成！' : '完成三個單元即可解鎖「力學小達人」勳章'}</h3><p class="text-xs sm:text-sm text-slate-600">${allDone ? '點擊右側按鈕彙整學習歷程並領取結果頁勳章。' : '目前尚有單元未完成，請先點選上方單元進行學習。'}</p></div>
+          </div>
+          <button type="button" onclick="${allDone ? "navigateTo('result')" : "document.getElementById('home-hint-box').classList.remove('hidden')"}" class="btn-action px-6 py-3 rounded-xl font-black text-sm shrink-0 ${allDone ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-md' : 'bg-slate-200 text-slate-500'}">${allDone ? '查看結果與領取勳章 →' : '尚未解鎖勳章'}</button>
+        </section>
+        <div id="home-hint-box" class="hidden p-3 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 text-sm font-bold text-center">流程提示：三個單元尚未全部完成，請先完成所有標示「未完成」的單元！</div>
+      </div>`;
     }
 
     function startUnit1() { appState.u1.step = 'intro'; appState.u1.feedback = null; navigateTo('unit1'); }
-
     function renderUnit1View() {
       const { step, answers, feedback } = appState.u1;
-      return `
-        <div class="space-y-5">
-          <div class="bg-rose-500 text-white rounded-2xl p-5 shadow-sm flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <span class="text-xs font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-lg">階段一</span>
-              <h1 class="text-xl sm:text-2xl font-black mt-1">一、力的種類介紹</h1>
-            </div>
-            <button onclick="navigateTo('home')" class="btn-action px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-sm font-bold">← 返回首頁</button>
-          </div>
-
-          ${step === 'intro' ? `
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <h2 class="text-lg font-black text-slate-900">系統展示：接觸力與非接觸力</h2>
-                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">來源：企劃書第 6 頁 ＋ 知識文件</span>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="p-5 rounded-2xl bg-rose-50 border-2 border-rose-200 space-y-3">
-                  <div class="flex items-center justify-between">
-                    <span class="text-lg font-black text-rose-700">接觸力</span>
-                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-rose-200 text-rose-900">必須碰觸</span>
-                  </div>
-                  <p class="text-base font-bold text-slate-800">必須碰觸才有效。</p>
-                  <div class="bg-white p-3 rounded-xl border border-rose-100 text-sm text-slate-700 space-y-1">
-                    <p><strong>基本範例：</strong>彈力、摩擦力</p>
-                    <p><strong>生活情境（知識文件）：</strong>彈簧受力形變（彈力）；穿山甲爪子抓樹幹爬樹、吸管卡住棉線、抹布／砂紙／PP板斜坡滑行（摩擦力）。</p>
-                  </div>
-                </div>
-                <div class="p-5 rounded-2xl bg-sky-50 border-2 border-sky-200 space-y-3">
-                  <div class="flex items-center justify-between">
-                    <span class="text-lg font-black text-sky-700">非接觸力</span>
-                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-sky-200 text-sky-900">隔空作用</span>
-                  </div>
-                  <p class="text-base font-bold text-slate-800">隔空就能發揮作用。</p>
-                  <div class="bg-white p-3 rounded-xl border border-sky-100 text-sm text-slate-700 space-y-1">
-                    <p><strong>基本範例：</strong>磁力、重力</p>
-                    <p><strong>生活情境（知識文件）：</strong>強力磁鐵掛鉤吸住物體（磁力）；物體與爬樹動物皆受「地球引力（重力）」向下作用。</p>
-                  </div>
-                </div>
-              </div>
-              <div class="pt-2 flex justify-end">
-                <button onclick="goUnit1Quiz()" class="btn-action px-6 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-sm shadow">下一步：進行種類分類小測試 →</button>
-              </div>
-            </div>
-          ` : ''}
-
-          ${step === 'quiz' ? `
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
-              <div>
-                <h2 class="text-lg font-black text-slate-900">種類分類小測試</h2>
-                <p class="text-sm text-slate-600">請點選按鈕，將下列四種力正確分類為「接觸力」或「非接觸力」。</p>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                ${renderU1QuizItem('spring', '彈力', answers.spring)}
-                ${renderU1QuizItem('gravity', '重力', answers.gravity)}
-                ${renderU1QuizItem('friction', '摩擦力', answers.friction)}
-                ${renderU1QuizItem('magnet', '磁力', answers.magnet)}
-              </div>
-              ${feedback ? `<div class="p-4 rounded-xl border-2 ${feedback.ok ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-amber-50 border-amber-400 text-amber-900'} text-sm font-bold">${feedback.message}</div>` : ''}
-              <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
-                <button onclick="appState.u1.step='intro'; renderApp();" class="btn-action px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">← 回看定義與範例</button>
-                <button onclick="checkUnit1Quiz()" class="btn-action px-6 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-sm shadow">送出分類答案</button>
-              </div>
-            </div>
-          ` : ''}
-
-          ${step === 'summary' ? `
-            <div class="bg-white rounded-2xl p-6 border-2 border-emerald-400 space-y-5">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black">✓</div>
-                <div>
-                  <h2 class="text-lg font-black text-emerald-800">答題正確！已記錄「力的種類介紹」完成</h2>
-                  <p class="text-xs text-slate-600">系統已更新您的學習歷程。</p>
-                </div>
-              </div>
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-sm">
-                <p class="font-black text-slate-900">重點整理：</p>
-                <p>• <strong>接觸力</strong>：必須碰觸才有效（如：彈力、摩擦力）。</p>
-                <p>• <strong>非接觸力</strong>：隔空就能發揮作用（如：磁力、重力）。</p>
-              </div>
-              <div class="flex flex-wrap justify-end gap-3">
-                <button onclick="navigateTo('home')" class="btn-action px-5 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-sm">返回首頁</button>
-                <button onclick="startUnit2()" class="btn-action px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">前往下一單元：二、摩擦力登場 →</button>
-              </div>
-            </div>
-          ` : ''}
+      return `<div class="space-y-5">
+        <div class="bg-rose-500 text-white rounded-2xl p-5 shadow-sm flex flex-wrap items-center justify-between gap-3">
+          <div><span class="text-xs font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-lg">階段一</span><h1 class="text-xl sm:text-2xl font-black mt-1">一、力的種類介紹</h1></div>
+          <button type="button" onclick="navigateTo('home')" class="btn-action px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-sm font-bold">← 返回首頁</button>
         </div>
-      `;
-    }
-
-    function renderU1QuizItem(key, label, currentVal) {
-      return `
-        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
-          <span class="font-black text-base text-slate-900">${label}</span>
-          <div class="flex gap-2">
-            <button onclick="selectU1Answer('${key}', 'contact')" class="btn-action px-3 py-2 rounded-xl text-xs font-black border ${currentVal === 'contact' ? 'bg-rose-500 text-white border-rose-600 shadow' : 'bg-white text-slate-700 border-slate-300 hover:bg-rose-50'}">接觸力</button>
-            <button onclick="selectU1Answer('${key}', 'non-contact')" class="btn-action px-3 py-2 rounded-xl text-xs font-black border ${currentVal === 'non-contact' ? 'bg-sky-600 text-white border-sky-700 shadow' : 'bg-white text-slate-700 border-slate-300 hover:bg-sky-50'}">非接觸力</button>
+        ${step === 'intro' ? `<div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2"><h2 class="text-lg font-black text-slate-900">系統展示：接觸力與非接觸力</h2><span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">來源：企劃書第 6 頁 ＋ 知識文件</span></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-5 rounded-2xl bg-rose-50 border-2 border-rose-200 space-y-3"><div class="flex items-center justify-between"><span class="text-lg font-black text-rose-700">接觸力</span><span class="text-xs font-bold px-2 py-0.5 rounded bg-rose-200 text-rose-900">必須碰觸</span></div><p class="text-base font-bold text-slate-800">必須碰觸才有效。</p><div class="bg-white p-3 rounded-xl border border-rose-100 text-sm text-slate-700 space-y-1"><p><strong>基本範例：</strong>彈力、摩擦力</p><p><strong>生活情境（知識文件）：</strong>彈簧受力形變（彈力）；穿山甲爪子抓樹幹爬樹、吸管卡住棉線、抹布／砂紙／PP板斜坡滑行（摩擦力）。</p></div></div>
+            <div class="p-5 rounded-2xl bg-sky-50 border-2 border-sky-200 space-y-3"><div class="flex items-center justify-between"><span class="text-lg font-black text-sky-700">非接觸力</span><span class="text-xs font-bold px-2 py-0.5 rounded bg-sky-200 text-sky-900">隔空作用</span></div><p class="text-base font-bold text-slate-800">隔空就能發揮作用。</p><div class="bg-white p-3 rounded-xl border border-sky-100 text-sm text-slate-700 space-y-1"><p><strong>基本範例：</strong>磁力、重力</p><p><strong>生活情境（知識文件）：</strong>強力磁鐵掛鉤吸住物體（磁力）；物體與爬樹動物皆受「地球引力（重力）」向下作用。</p></div></div>
           </div>
-        </div>
-      `;
+          <div class="pt-2 flex justify-end"><button type="button" onclick="appState.u1.step='quiz'; appState.u1.feedback=null; renderApp();" class="btn-action px-6 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-sm shadow">下一步：進行種類分類小測試 →</button></div>
+        </div>` : ''}
+        ${step === 'quiz' ? `<div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
+          <div><h2 class="text-lg font-black text-slate-900">種類分類小測試</h2><p class="text-sm text-slate-600">請點選按鈕，將下列四種力正確分類為「接觸力」或「非接觸力」。</p></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            ${[['spring','彈力'],['gravity','重力'],['friction','摩擦力'],['magnet','磁力']].map(([k,l]) => `<div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3"><span class="font-black text-base text-slate-900">${l}</span><div class="flex gap-2"><button type="button" onclick="appState.u1.answers['${k}']='contact'; renderApp();" class="btn-action px-3 py-2 rounded-xl text-xs font-black border ${answers[k]==='contact'?'bg-rose-500 text-white border-rose-600 shadow':'bg-white text-slate-700 border-slate-300'}">接觸力</button><button type="button" onclick="appState.u1.answers['${k}']='non-contact'; renderApp();" class="btn-action px-3 py-2 rounded-xl text-xs font-black border ${answers[k]==='non-contact'?'bg-sky-600 text-white border-sky-700 shadow':'bg-white text-slate-700 border-slate-300'}">非接觸力</button></div></div>`).join('')}
+          </div>
+          ${feedback ? `<div class="p-4 rounded-xl border-2 ${feedback.ok ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-amber-50 border-amber-400 text-amber-900'} text-sm font-bold">${feedback.message}</div>` : ''}
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <button type="button" onclick="appState.u1.step='intro'; renderApp();" class="btn-action px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">← 回看定義與範例</button>
+            <button type="button" onclick="checkUnit1Quiz()" class="btn-action px-6 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-sm shadow">送出分類答案</button>
+          </div>
+        </div>` : ''}
+        ${step === 'summary' ? `<div class="bg-white rounded-2xl p-6 border-2 border-emerald-400 space-y-5">
+          <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black">✓</div><div><h2 class="text-lg font-black text-emerald-800">答題正確！已記錄「力的種類介紹」完成</h2><p class="text-xs text-slate-600">系統已更新您的學習歷程。</p></div></div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-sm"><p class="font-black text-slate-900">重點整理：</p><p>• <strong>接觸力</strong>：必須碰觸才有效（如：彈力、摩擦力）。</p><p>• <strong>非接觸力</strong>：隔空就能發揮作用（如：磁力、重力）。</p></div>
+          <div class="flex flex-wrap justify-end gap-3"><button type="button" onclick="navigateTo('home')" class="btn-action px-5 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-sm">返回首頁</button><button type="button" onclick="startUnit2()" class="btn-action px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">前往下一單元：二、摩擦力登場 →</button></div>
+        </div>` : ''}
+      </div>`;
     }
-
-    function goUnit1Quiz() { appState.u1.step = 'quiz'; appState.u1.feedback = null; renderApp(); }
-    function selectU1Answer(key, val) { appState.u1.answers[key] = val; renderApp(); }
 
     function checkUnit1Quiz() {
       const a = appState.u1.answers;
-      if (!a.spring || !a.gravity || !a.friction || !a.magnet) {
-        appState.u1.feedback = { ok: false, message: '請先完成全部 4 個項目的分類選擇再送出！' };
-        renderApp(); return;
-      }
+      if (!a.spring || !a.gravity || !a.friction || !a.magnet) { appState.u1.feedback = { ok: false, message: '請先完成全部 4 個項目的分類選擇再送出！' }; renderApp(); return; }
       appState.history.u1Attempts += 1;
       if (a.spring === 'contact' && a.friction === 'contact' && a.gravity === 'non-contact' && a.magnet === 'non-contact') {
         appState.completed.unit1 = true; updateTopBadges(); appState.u1.step = 'summary'; renderApp();
       } else {
-        appState.u1.feedback = { ok: false, message: '引導與錯誤解析：必須碰觸才有效的「接觸力」包含彈力（如彈簧形變）、摩擦力（如穿山甲抓樹幹）；隔空作用的「非接觸力」包含磁力（如強力磁鐵掛鉤）、重力（地球引力向下作用）。請修正後再試！' };
-        renderApp();
+        appState.u1.feedback = { ok: false, message: '引導與錯誤解析：必須碰觸才有效的「接觸力」包含彈力、摩擦力；隔空作用的「非接觸力」包含磁力、重力。請修正後再試！' }; renderApp();
       }
     }
 
     function startUnit2() { appState.u2.step = 'concept'; appState.u2.feedback = null; navigateTo('unit2'); }
-
     function renderUnit2View() {
       const { step, frictionResistance, materialName, selectedDir, feedback } = appState.u2;
-      return `
-        <div class="space-y-5">
-          <div class="bg-sky-600 text-white rounded-2xl p-5 shadow-sm flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <span class="text-xs font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-lg">階段二</span>
-              <h1 class="text-xl sm:text-2xl font-black mt-1">二、摩擦力登場</h1>
-            </div>
-            <button onclick="navigateTo('home')" class="btn-action px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-sm font-bold">← 返回首頁</button>
-          </div>
-
-          ${step === 'concept' ? `
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <h2 class="text-lg font-black text-slate-900">系統展示：摩擦力與運動方向</h2>
-                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">來源：企劃書第 7 頁 ＋ 知識文件</span>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
-                <div class="bg-sky-50 rounded-2xl p-4 border border-sky-200 flex flex-col items-center">
-                  <svg class="w-64 h-44" viewBox="0 0 260 180" fill="none">
-                    <polygon points="20,160 240,160 240,50" fill="#CBD5E1" stroke="#64748B" stroke-width="2"/>
-                    <g transform="translate(125, 88) rotate(-26.5)">
-                      <rect x="-32" y="-22" width="64" height="44" rx="6" fill="#3B82F6"/>
-                      <line x1="0" y1="0" x2="0" y2="-52" stroke="#EF4444" stroke-width="5" stroke-linecap="round"/>
-                      <polyline points="-10,-42 0,-54 10,-42" stroke="#EF4444" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-                      <line x1="0" y1="0" x2="56" y2="0" stroke="#22C55E" stroke-width="5" stroke-linecap="round"/>
-                      <polyline points="46,-10 58,0 46,10" stroke="#22C55E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </g>
-                    <line x1="125" y1="88" x2="125" y2="152" stroke="#0F172A" stroke-width="5" stroke-linecap="round"/>
-                    <polyline points="115,142 125,154 135,142" stroke="#0F172A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  <p class="text-xs text-slate-600 font-bold mt-1">綠箭頭：摩擦力｜黑箭頭：地球引力｜紅箭頭：多力平衡支撐【正向力名稱待確認】</p>
-                </div>
-                <div class="space-y-3">
-                  <div class="p-4 rounded-xl bg-sky-50 border border-sky-200">
-                    <p class="text-base font-black text-sky-900">核心概念：</p>
-                    <p class="text-lg font-extrabold text-slate-900 mt-1">「摩擦力方向與運動相反。」</p>
-                  </div>
-                  <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-sm text-slate-800 space-y-1">
-                    <p class="font-black text-emerald-900">生活案例：為什麼穿山甲能爬樹，卻爬不上電線桿？</p>
-                    <p>因為樹幹表面粗糙、摩擦力較大；電線桿表面較光滑、摩擦力較小，抓不住就會滑下來。</p>
-                  </div>
-                </div>
-              </div>
-              <div class="flex justify-end">
-                <button onclick="goUnit2Sim()" class="btn-action px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">下一步：不同接觸面材質實驗 →</button>
-              </div>
-            </div>
-          ` : ''}
-
-          ${step === 'sim' ? `
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <h2 class="text-lg font-black text-slate-900">互動操作：切換接觸面材質與摩擦阻力</h2>
-                  <p class="text-sm text-slate-600">不同材質的表面粗糙程度不同，產生的摩擦阻力（單位：<strong>gw 公克重</strong>）也不同。</p>
-                </div>
-                <span id="u2-speed-badge" class="px-3 py-1.5 rounded-xl bg-sky-100 text-sky-900 text-xs font-black">目前狀態：待推動</span>
-              </div>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs font-black text-slate-700">選擇接觸面材質：</span>
-                <button onclick="setU2Material(20, 'PP板（光滑）')" class="btn-action px-3 py-1.5 rounded-xl text-xs font-black border ${frictionResistance === 20 ? 'bg-sky-600 text-white border-sky-700' : 'bg-white text-slate-700 border-slate-300 hover:bg-sky-50'}">PP板（光滑｜阻力 20 gw）</button>
-                <button onclick="setU2Material(50, '抹布（中等粗糙）')" class="btn-action px-3 py-1.5 rounded-xl text-xs font-black border ${frictionResistance === 50 ? 'bg-sky-600 text-white border-sky-700' : 'bg-white text-slate-700 border-slate-300 hover:bg-sky-50'}">抹布（中等｜阻力 50 gw）</button>
-                <button onclick="setU2Material(85, '砂紙（非常粗糙）')" class="btn-action px-3 py-1.5 rounded-xl text-xs font-black border ${frictionResistance === 85 ? 'bg-sky-600 text-white border-sky-700' : 'bg-white text-slate-700 border-slate-300 hover:bg-sky-50'}">砂紙（粗糙｜阻力 85 gw）</button>
-              </div>
-              <div id="u2-canvas-wrap" class="w-full h-56 rounded-2xl bg-sky-50 border-2 border-sky-200 overflow-hidden relative">
-                <canvas id="u2-canvas" class="w-full h-full block"></canvas>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                <div class="sm:col-span-2 space-y-1">
-                  <div class="flex justify-between text-sm font-black text-slate-800">
-                    <span>接觸面摩擦阻力（公克重 gw）</span>
-                    <span id="u2-rough-label" class="text-sky-700">${frictionResistance} gw（${materialName}）</span>
-                  </div>
-                  <input id="u2-rough-slider" type="range" min="10" max="90" value="${frictionResistance}" oninput="updateU2Resistance(this.value)" class="w-full accent-sky-600 cursor-pointer h-3" />
-                  <div class="flex justify-between text-xs text-slate-500 font-bold">
-                    <span>光滑／PP板 (10 gw)</span><span>粗糙／砂紙 (90 gw)</span>
-                  </div>
-                </div>
-                <div class="flex justify-end">
-                  <button onclick="launchU2Block()" class="btn-action w-full sm:w-auto px-6 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">▶ 推動木塊向右滑行</button>
-                </div>
-              </div>
-              <div class="flex flex-wrap justify-between gap-3 pt-1">
-                <button onclick="stopCanvasAnim(); appState.u2.step='concept'; renderApp();" class="btn-action px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">← 回看基本概念</button>
-                <button onclick="goUnit2Challenge()" class="btn-action px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">下一步：摩擦力方向判斷挑戰 →</button>
-              </div>
-            </div>
-          ` : ''}
-
-          ${step === 'challenge' ? `
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
-              <h2 class="text-lg font-black text-slate-900">摩擦力方向判斷挑戰</h2>
-              <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200 space-y-2">
-                <p class="font-bold text-slate-900">情境題目：</p>
-                <p class="text-base text-slate-800">一個木塊正在水平地板上<strong>「向右滑行 →」</strong>，請問地板給木塊的<strong>摩擦力方向</strong>指向哪裡？</p>
-              </div>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                ${renderU2DirBtn('left', '← 向左', selectedDir)}
-                ${renderU2DirBtn('right', '向右 →', selectedDir)}
-                ${renderU2DirBtn('up', '↑ 向上', selectedDir)}
-                ${renderU2DirBtn('down', '↓ 向下', selectedDir)}
-              </div>
-              ${feedback ? `<div class="p-4 rounded-xl border-2 ${feedback.ok ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-amber-50 border-amber-400 text-amber-900'} text-sm font-bold">${feedback.message}</div>` : ''}
-              <div class="flex flex-wrap justify-between gap-3 pt-2">
-                <button onclick="goUnit2Sim()" class="btn-action px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">← 回去觀察實驗</button>
-                <button onclick="checkUnit2Challenge()" class="btn-action px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">確認方向答案</button>
-              </div>
-            </div>
-          ` : ''}
-
-          ${step === 'summary' ? `
-            <div class="bg-white rounded-2xl p-6 border-2 border-emerald-400 space-y-5">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black">✓</div>
-                <div>
-                  <h2 class="text-lg font-black text-emerald-800">答題正確！已記錄「摩擦力登場」完成</h2>
-                  <p class="text-xs text-slate-600">木塊向右滑行時，摩擦力向左（與運動方向相反）。</p>
-                </div>
-              </div>
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-sm">
-                <p class="font-black text-slate-900">現象解析：</p>
-                <p>• 接觸面越粗糙（例如砂紙），摩擦阻力（gw）越大，木塊滑行距離越短。</p>
-                <p>• 摩擦力方向與物體運動方向相反。</p>
-              </div>
-              <div class="flex flex-wrap justify-end gap-3">
-                <button onclick="navigateTo('home')" class="btn-action px-5 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-sm">返回首頁</button>
-                <button onclick="startUnit3()" class="btn-action px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow">前往下一單元：三、動手操作 →</button>
-              </div>
-            </div>
-          ` : ''}
+      return `<div class="space-y-5">
+        <div class="bg-sky-600 text-white rounded-2xl p-5 shadow-sm flex flex-wrap items-center justify-between gap-3">
+          <div><span class="text-xs font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-lg">階段二</span><h1 class="text-xl sm:text-2xl font-black mt-1">二、摩擦力登場</h1></div>
+          <button type="button" onclick="navigateTo('home')" class="btn-action px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-sm font-bold">← 返回首頁</button>
         </div>
-      `;
+        ${step === 'concept' ? `<div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2"><h2 class="text-lg font-black text-slate-900">系統展示：摩擦力與運動方向</h2><span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">來源：企劃書第 7 頁 ＋ 知識文件</span></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
+            <div class="bg-sky-50 rounded-2xl p-4 border border-sky-200 flex flex-col items-center">
+              <svg class="w-64 h-44" viewBox="0 0 260 180" fill="none">
+                <polygon points="20,160 240,160 240,50" fill="#CBD5E1" stroke="#64748B" stroke-width="2"/>
+                <g transform="translate(125, 88) rotate(-26.5)">
+                  <rect x="-32" y="-22" width="64" height="44" rx="6" fill="#3B82F6"/>
+                  <line x1="0" y1="0" x2="0" y2="-52" stroke="#EF4444" stroke-width="5" stroke-linecap="round"/><polyline points="-10,-42 0,-54 10,-42" stroke="#EF4444" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <line x1="0" y1="0" x2="56" y2="0" stroke="#22C55E" stroke-width="5" stroke-linecap="round"/><polyline points="46,-10 58,0 46,10" stroke="#22C55E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                </g>
+                <line x1="125" y1="88" x2="125" y2="152" stroke="#0F172A" stroke-width="5" stroke-linecap="round"/><polyline points="115,142 125,154 135,142" stroke="#0F172A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p class="text-xs text-slate-600 font-bold mt-1">綠箭頭：摩擦力｜黑箭頭：地球引力｜紅箭頭：多力平衡支撐【正向力名稱待確認】</p>
+            </div>
+            <div class="space-y-3">
+              <div class="p-4 rounded-xl bg-sky-50 border border-sky-200"><p class="text-base font-black text-sky-900">核心概念：</p><p class="text-lg font-extrabold text-slate-900 mt-1">「摩擦力方向與運動相反。」</p></div>
+              <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-sm text-slate-800 space-y-1"><p class="font-black text-emerald-900">生活案例：為什麼穿山甲能爬樹，卻爬不上電線桿？</p><p>因為樹幹表面粗糙、摩擦力較大；電線桿表面較光滑、摩擦力較小，抓不住就會滑下來。</p></div>
+            </div>
+          </div>
+          <div class="flex justify-end"><button type="button" onclick="stopCanvasAnim(); appState.u2.step='sim'; renderApp();" class="btn-action px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">下一步：不同接觸面材質實驗 →</button></div>
+        </div>` : ''}
+        ${step === 'sim' ? `<div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2"><div><h2 class="text-lg font-black text-slate-900">互動操作：切換接觸面材質與摩擦阻力</h2><p class="text-sm text-slate-600">不同材質的表面粗糙程度不同，產生的摩擦阻力（單位：<strong>gw 公克重</strong>）也不同。</p></div><span id="u2-speed-badge" class="px-3 py-1.5 rounded-xl bg-sky-100 text-sky-900 text-xs font-black">目前狀態：待推動</span></div>
+          <div class="flex flex-wrap items-center gap-2"><span class="text-xs font-black text-slate-700">選擇接觸面材質：</span>
+            <button type="button" onclick="appState.u2.frictionResistance=20; appState.u2.materialName='PP板（光滑）'; renderApp();" class="btn-action px-3 py-1.5 rounded-xl text-xs font-black border ${frictionResistance===20?'bg-sky-600 text-white border-sky-700':'bg-white text-slate-700 border-slate-300'}">PP板（光滑｜阻力 20 gw）</button>
+            <button type="button" onclick="appState.u2.frictionResistance=50; appState.u2.materialName='抹布（中等粗糙）'; renderApp();" class="btn-action px-3 py-1.5 rounded-xl text-xs font-black border ${frictionResistance===50?'bg-sky-600 text-white border-sky-700':'bg-white text-slate-700 border-slate-300'}">抹布（中等｜阻力 50 gw）</button>
+            <button type="button" onclick="appState.u2.frictionResistance=85; appState.u2.materialName='砂紙（非常粗糙）'; renderApp();" class="btn-action px-3 py-1.5 rounded-xl text-xs font-black border ${frictionResistance===85?'bg-sky-600 text-white border-sky-700':'bg-white text-slate-700 border-slate-300'}">砂紙（粗糙｜阻力 85 gw）</button>
+          </div>
+          <div id="u2-canvas-wrap" class="w-full h-56 rounded-2xl bg-sky-50 border-2 border-sky-200 overflow-hidden relative"><canvas id="u2-canvas" class="w-full h-full block"></canvas></div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center bg-slate-50 p-4 rounded-2xl border border-slate-200">
+            <div class="sm:col-span-2 space-y-1">
+              <div class="flex justify-between text-sm font-black text-slate-800"><span>接觸面摩擦阻力（公克重 gw）</span><span id="u2-rough-label" class="text-sky-700">${frictionResistance} gw（${materialName}）</span></div>
+              <input type="range" min="10" max="90" value="${frictionResistance}" oninput="updateU2Resistance(this.value)" class="w-full accent-sky-600 cursor-pointer h-3" />
+              <div class="flex justify-between text-xs text-slate-500 font-bold"><span>光滑／PP板 (10 gw)</span><span>粗糙／砂紙 (90 gw)</span></div>
+            </div>
+            <div class="flex justify-end"><button type="button" onclick="u2SimState={x:50,vx:7.5,moving:true};" class="btn-action w-full sm:w-auto px-6 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">▶ 推動木塊向右滑行</button></div>
+          </div>
+          <div class="flex flex-wrap justify-between gap-3 pt-1">
+            <button type="button" onclick="stopCanvasAnim(); appState.u2.step='concept'; renderApp();" class="btn-action px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">← 回看基本概念</button>
+            <button type="button" onclick="stopCanvasAnim(); appState.u2.step='challenge'; appState.u2.feedback=null; renderApp();" class="btn-action px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">下一步：摩擦力方向判斷挑戰 →</button>
+          </div>
+        </div>` : ''}
+        ${step === 'challenge' ? `<div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
+          <h2 class="text-lg font-black text-slate-900">摩擦力方向判斷挑戰</h2>
+          <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200 space-y-2"><p class="font-bold text-slate-900">情境題目：</p><p class="text-base text-slate-800">一個木塊正在水平地板上<strong>「向右滑行 →」</strong>，請問地板給木塊的<strong>摩擦力方向</strong>指向哪裡？</p></div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            ${[['left','← 向左'],['right','向右 →'],['up','↑ 向上'],['down','↓ 向下']].map(([v,l]) => `<button type="button" onclick="appState.u2.selectedDir='${v}'; renderApp();" class="btn-action p-4 rounded-2xl font-black text-base border-2 ${selectedDir===v?'bg-sky-600 text-white border-sky-700 shadow-md':'bg-white text-slate-800 border-slate-200'}">${l}</button>`).join('')}
+          </div>
+          ${feedback ? `<div class="p-4 rounded-xl border-2 ${feedback.ok ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-amber-50 border-amber-400 text-amber-900'} text-sm font-bold">${feedback.message}</div>` : ''}
+          <div class="flex flex-wrap justify-between gap-3 pt-2">
+            <button type="button" onclick="stopCanvasAnim(); appState.u2.step='sim'; renderApp();" class="btn-action px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">← 回去觀察實驗</button>
+            <button type="button" onclick="checkUnit2Challenge()" class="btn-action px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">確認方向答案</button>
+          </div>
+        </div>` : ''}
+        ${step === 'summary' ? `<div class="bg-white rounded-2xl p-6 border-2 border-emerald-400 space-y-5">
+          <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black">✓</div><div><h2 class="text-lg font-black text-emerald-800">答題正確！已記錄「摩擦力登場」完成</h2><p class="text-xs text-slate-600">木塊向右滑行時，摩擦力向左（與運動方向相反）。</p></div></div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-sm"><p class="font-black text-slate-900">現象解析：</p><p>• 接觸面越粗糙（例如砂紙），摩擦阻力（gw）越大，木塊滑行距離越短。</p><p>• 摩擦力方向與物體運動方向相反。</p></div>
+          <div class="flex flex-wrap justify-end gap-3"><button type="button" onclick="navigateTo('home')" class="btn-action px-5 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-sm">返回首頁</button><button type="button" onclick="startUnit3()" class="btn-action px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow">前往下一單元：三、動手操作 →</button></div>
+        </div>` : ''}
+      </div>`;
     }
-
-    function renderU2DirBtn(val, label, selectedDir) {
-      const active = selectedDir === val;
-      return `<button onclick="appState.u2.selectedDir='${val}'; renderApp();" class="btn-action p-4 rounded-2xl font-black text-base border-2 ${active ? 'bg-sky-600 text-white border-sky-700 shadow-md' : 'bg-white text-slate-800 border-slate-200 hover:border-sky-400'}">${label}</button>`;
-    }
-
-    function goUnit2Sim() { stopCanvasAnim(); appState.u2.step = 'sim'; appState.u2.feedback = null; renderApp(); }
 
     let u2SimState = { x: 50, vx: 0, moving: false };
-    function setU2Material(val, name) { appState.u2.frictionResistance = val; appState.u2.materialName = name; renderApp(); }
     function updateU2Resistance(val) {
-      appState.u2.frictionResistance = Number(val);
-      const r = appState.u2.frictionResistance;
+      const r = Number(val); appState.u2.frictionResistance = r;
       const mat = r < 35 ? '接近 PP板（較光滑）' : r > 65 ? '接近砂紙（較粗糙）' : '接近抹布（適中）';
       appState.u2.materialName = mat;
-      const lbl = document.getElementById('u2-rough-label');
-      if (lbl) lbl.textContent = `${r} gw（${mat}）`;
+      const lbl = document.getElementById('u2-rough-label'); if (lbl) lbl.textContent = `${r} gw（${mat}）`;
     }
-    function launchU2Block() { u2SimState.x = 50; u2SimState.vx = 7.5; u2SimState.moving = true; }
 
     function initUnit2Canvas() {
-      const canvas = document.getElementById('u2-canvas');
-      const wrap = document.getElementById('u2-canvas-wrap');
-      if (!canvas || !wrap) return;
-      const ctx = canvas.getContext('2d');
-      function resize() { canvas.width = wrap.clientWidth; canvas.height = wrap.clientHeight; }
-      resize(); window.addEventListener('resize', resize);
-
-      function drawArrow(fromX, fromY, toX, toY, color, label) {
-        const headlen = 10, angle = Math.atan2(toY - fromY, toX - fromX);
+      const canvas = document.getElementById('u2-canvas'), wrap = document.getElementById('u2-canvas-wrap');
+      if (!canvas || !wrap) return; const ctx = canvas.getContext('2d');
+      canvas.width = wrap.clientWidth; canvas.height = wrap.clientHeight;
+      function drawArrow(fx, fy, tx, ty, color, label) {
+        const hl = 10, ang = Math.atan2(ty - fy, tx - fx);
         ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 4;
-        ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(toX, toY);
-        ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
-        ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
-        ctx.closePath(); ctx.fill();
-        ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
-        ctx.fillText(label, Math.min(fromX, toX), fromY - 10);
-        ctx.restore();
+        ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(tx, ty); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(tx - hl * Math.cos(ang - Math.PI / 6), ty - hl * Math.sin(ang - Math.PI / 6)); ctx.lineTo(tx - hl * Math.cos(ang + Math.PI / 6), ty - hl * Math.sin(ang + Math.PI / 6)); ctx.closePath(); ctx.fill();
+        ctx.font = 'bold 12px "Noto Sans TC", sans-serif'; ctx.fillText(label, Math.min(fx, tx), fy - 10); ctx.restore();
       }
-
       function loop() {
         if (appState.currentView !== 'unit2' || appState.u2.step !== 'sim') return;
         const w = canvas.width, h = canvas.height, floorY = h - 42, resist = appState.u2.frictionResistance;
         if (u2SimState.moving) {
-          u2SimState.x += u2SimState.vx;
-          const decel = 0.02 + (resist / 100) * 0.14;
-          u2SimState.vx = Math.max(0, u2SimState.vx - decel);
+          u2SimState.x += u2SimState.vx; u2SimState.vx = Math.max(0, u2SimState.vx - (0.02 + (resist / 100) * 0.14));
           if (u2SimState.x > w - 95) { u2SimState.x = w - 95; u2SimState.vx = 0; }
           if (u2SimState.vx <= 0.01) { u2SimState.vx = 0; u2SimState.moving = false; }
         }
-        const badge = document.getElementById('u2-speed-badge');
-        const distCm = Math.max(0, Math.round((u2SimState.x - 50) / 5));
+        const badge = document.getElementById('u2-speed-badge'), distCm = Math.max(0, Math.round((u2SimState.x - 50) / 5));
         if (badge) badge.textContent = u2SimState.moving ? `滑行中｜目前距離：${distCm} cm（阻力 ${resist} gw）` : `已停止｜總滑行距離：${distCm} cm`;
-
-        ctx.clearRect(0, 0, w, h);
-        ctx.fillStyle = '#E2E8F0'; ctx.fillRect(0, floorY, w, h - floorY);
-        ctx.fillStyle = '#64748B';
+        ctx.clearRect(0, 0, w, h); ctx.fillStyle = '#E2E8F0'; ctx.fillRect(0, floorY, w, h - floorY); ctx.fillStyle = '#64748B';
         const step = Math.max(8, 36 - Math.floor(resist * 0.3));
-        for (let gx = 10; gx < w; gx += step) {
-          ctx.beginPath(); ctx.arc(gx, floorY + 5, resist > 60 ? 2.5 : 1.5, 0, Math.PI * 2); ctx.fill();
-        }
+        for (let gx = 10; gx < w; gx += step) { ctx.beginPath(); ctx.arc(gx, floorY + 5, resist > 60 ? 2.5 : 1.5, 0, Math.PI * 2); ctx.fill(); }
         const bx = u2SimState.x, by = floorY - 46;
         ctx.fillStyle = '#2563EB'; ctx.beginPath(); ctx.roundRect(bx, by, 70, 46, 8); ctx.fill();
         ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 13px "Noto Sans TC", sans-serif'; ctx.fillText('木塊', bx + 21, by + 28);
-
         if (u2SimState.moving && u2SimState.vx > 0) {
           const cx = bx + 35, cy = by + 23;
           drawArrow(cx + 35, cy - 12, cx + 35 + u2SimState.vx * 8, cy - 12, '#0284C7', '運動方向 →');
-          const fLen = 25 + resist * 0.55;
-          drawArrow(cx - 35, cy + 12, cx - 35 - fLen, cy + 12, '#DC2626', `← 摩擦力 (${resist} gw)`);
+          drawArrow(cx - 35, cy + 12, cx - 35 - (25 + resist * 0.55), cy + 12, '#DC2626', `← 摩擦力 (${resist} gw)`);
         }
         activeAnimFrame = requestAnimationFrame(loop);
       }
       loop();
     }
 
-    function goUnit2Challenge() { stopCanvasAnim(); appState.u2.step = 'challenge'; appState.u2.feedback = null; renderApp(); }
-
     function checkUnit2Challenge() {
-      if (!appState.u2.selectedDir) {
-        appState.u2.feedback = { ok: false, message: '請先點選一個摩擦力方向按鈕！' }; renderApp(); return;
-      }
+      if (!appState.u2.selectedDir) { appState.u2.feedback = { ok: false, message: '請先點選一個摩擦力方向按鈕！' }; renderApp(); return; }
       appState.history.u2Attempts += 1;
-      if (appState.u2.selectedDir === 'left') {
-        appState.completed.unit2 = true; updateTopBadges(); appState.u2.step = 'summary'; renderApp();
-      } else {
-        appState.u2.feedback = { ok: false, message: '動態提示與解析：摩擦力方向與運動方向相反！因為木塊正在「向右滑行 →」，所以阻礙滑動的摩擦力方向是「← 向左」。請重新選擇！' };
-        renderApp();
-      }
+      if (appState.u2.selectedDir === 'left') { appState.completed.unit2 = true; updateTopBadges(); appState.u2.step = 'summary'; renderApp(); }
+      else { appState.u2.feedback = { ok: false, message: '動態提示與解析：摩擦力方向與運動方向相反！木塊「向右滑行 →」，故摩擦力方向為「← 向左」。' }; renderApp(); }
     }
 
     function startUnit3() { appState.u3.step = 'task1'; appState.u3.task1Feedback = null; appState.u3.quizFeedback = null; navigateTo('unit3'); }
-
     function renderUnit3View() {
       const { step, task1Selections, task1Feedback, task2, quizAnswers, quizFeedback } = appState.u3;
-      return `
-        <div class="space-y-5">
-          <div class="bg-emerald-600 text-white rounded-2xl p-5 shadow-sm flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <span class="text-xs font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-lg">階段三：互動遊戲</span>
-              <h1 class="text-xl sm:text-2xl font-black mt-1">三、動手操作（力在哪裡 & 與力互動）</h1>
-            </div>
-            <button onclick="navigateTo('home')" class="btn-action px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-sm font-bold">← 返回首頁</button>
-          </div>
-
-          <div class="grid grid-cols-3 gap-2 bg-white p-2 rounded-2xl border border-slate-200 text-xs sm:text-sm font-black text-center">
-            <div class="py-2 px-2 rounded-xl ${step === 'task1' ? 'bg-emerald-600 text-white' : appState.history.u3Task1Done ? 'bg-emerald-100 text-emerald-800' : 'text-slate-500'}">任務1：力在哪裡</div>
-            <div class="py-2 px-2 rounded-xl ${step === 'task2' ? 'bg-emerald-600 text-white' : appState.history.u3Task2Done ? 'bg-emerald-100 text-emerald-800' : 'text-slate-500'}">任務2：與力互動</div>
-            <div class="py-2 px-2 rounded-xl ${step === 'quiz' || step === 'summary' ? 'bg-emerald-600 text-white' : 'text-slate-500'}">挑戰：破除迷思</div>
-          </div>
-
-          ${step === 'task1' ? `
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
-              <div>
-                <h2 class="text-lg font-black text-slate-900">任務 1：力在哪裡？（標示木塊受力方向）</h2>
-                <p class="text-sm text-slate-600">情境：人從左側<strong>向右推木塊</strong>，木塊在地板上向右滑動。請為四個方向箭頭選擇正確的力名稱！</p>
-              </div>
-              <div class="bg-emerald-50/70 rounded-2xl p-4 border border-emerald-200 flex flex-col items-center">
-                <svg class="w-72 h-52" viewBox="0 0 300 210" fill="none">
-                  <rect x="20" y="165" width="260" height="16" rx="4" fill="#CBD5E1"/>
-                  <rect x="115" y="95" width="70" height="50" rx="8" fill="#3B82F6"/>
-                  <text x="150" y="125" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="bold">木塊</text>
-                  <line x1="150" y1="95" x2="150" y2="38" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/>
-                  <polyline points="142,46 150,36 158,46" stroke="#EF4444" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                  <text x="150" y="25" text-anchor="middle" fill="#B91C1C" font-size="12" font-weight="bold">↑ 向上箭頭</text>
-                  <line x1="150" y1="145" x2="150" y2="195" stroke="#0F172A" stroke-width="4" stroke-linecap="round"/>
-                  <polyline points="142,187 150,197 158,187" stroke="#0F172A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                  <text x="210" y="198" text-anchor="middle" fill="#0F172A" font-size="12" font-weight="bold">↓ 向下箭頭</text>
-                  <line x1="185" y1="120" x2="255" y2="120" stroke="#0284C7" stroke-width="4" stroke-linecap="round"/>
-                  <polyline points="247,112 257,120 247,128" stroke="#0284C7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                  <text x="245" y="102" text-anchor="middle" fill="#0369A1" font-size="12" font-weight="bold">→ 向右箭頭</text>
-                  <line x1="115" y1="120" x2="45" y2="120" stroke="#16A34A" stroke-width="4" stroke-linecap="round"/>
-                  <polyline points="53,112 43,120 53,128" stroke="#16A34A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                  <text x="55" y="102" text-anchor="middle" fill="#15803D" font-size="12" font-weight="bold">← 向左箭頭</text>
-                </svg>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                ${renderTask1Select('down', '↓ 向下箭頭（指向地球）', task1Selections.down)}
-                ${renderTask1Select('left', '← 向左箭頭（與滑行方向相反）', task1Selections.left)}
-                ${renderTask1Select('right', '→ 向右箭頭（人向右推木塊）', task1Selections.right)}
-                ${renderTask1Select('up', '↑ 向上箭頭（企劃書圖示）', task1Selections.up)}
-              </div>
-              ${task1Feedback ? `<div class="p-4 rounded-xl border-2 ${task1Feedback.ok ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-amber-50 border-amber-400 text-amber-900'} text-sm font-bold">${task1Feedback.message}</div>` : ''}
-              <div class="flex justify-end">
-                <button onclick="checkUnit3Task1()" class="btn-action px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow">驗證受力標示 →</button>
-              </div>
-            </div>
-          ` : ''}
-
-          ${step === 'task2' ? `
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
-              <div>
-                <h2 class="text-lg font-black text-slate-900">任務 2：與力互動（預測 → 觀察 → 比較 → 修正）</h2>
-                <p class="text-sm text-slate-600">請先調整下方的「施力大小（<strong>gw 公克重</strong>）」與「接觸面材質」，選擇預測後再啟動實驗！</p>
-              </div>
-              <div class="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-200 space-y-4">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="text-xs font-black text-slate-700">1. 選擇接觸面材質：</span>
-                  <button onclick="setU3Material(20, 'PP板（光滑）')" class="btn-action px-3 py-1.5 rounded-xl text-xs font-black border ${task2.frictionResistance === 20 ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50'}">PP板（阻力 20 gw）</button>
-                  <button onclick="setU3Material(50, '抹布（中等粗糙）')" class="btn-action px-3 py-1.5 rounded-xl text-xs font-black border ${task2.frictionResistance === 50 ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50'}">抹布（阻力 50 gw）</button>
-                  <button onclick="setU3Material(85, '砂紙（非常粗糙）')" class="btn-action px-3 py-1.5 rounded-xl text-xs font-black border ${task2.frictionResistance === 85 ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50'}">砂紙（阻力 85 gw）</button>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <div class="flex justify-between text-sm font-black text-slate-800 mb-1">
-                      <span>2. 施力大小（推力／拉力）</span>
-                      <span id="u3-force-val" class="text-sky-700">${task2.force} gw（公克重）</span>
-                    </div>
-                    <input type="range" min="10" max="100" value="${task2.force}" oninput="updateU3Force(this.value)" class="w-full accent-sky-600 cursor-pointer h-3" />
-                  </div>
-                  <div>
-                    <div class="flex justify-between text-sm font-black text-slate-800 mb-1">
-                      <span>接觸面摩擦阻力</span>
-                      <span id="u3-rough-val" class="text-emerald-700">${task2.frictionResistance} gw（${task2.materialName}）</span>
-                    </div>
-                    <input type="range" min="10" max="100" value="${task2.frictionResistance}" oninput="updateU3Resistance(this.value)" class="w-full accent-emerald-600 cursor-pointer h-3" />
-                  </div>
-                </div>
-              </div>
-              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                <p id="u3-pred-prompt" class="text-sm font-black text-slate-900">3. 預測：目前施力 <strong>${task2.force} gw</strong>、摩擦阻力 <strong>${task2.frictionResistance} gw</strong>，木塊會如何運動？</p>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  ${renderPredBtn('fast', '施力大於阻力：加速前進', task2.prediction)}
-                  ${renderPredBtn('slow', '阻力大於施力：推不動（靜止）', task2.prediction)}
-                  ${renderPredBtn('equal', '施力與阻力相近：緩慢移動', task2.prediction)}
-                </div>
-              </div>
-              <div id="u3-canvas-wrap" class="w-full h-48 rounded-2xl bg-sky-50 border-2 border-emerald-200 overflow-hidden">
-                <canvas id="u3-canvas" class="w-full h-full block"></canvas>
-              </div>
-              <div class="flex flex-wrap items-center justify-between gap-3">
-                <button onclick="runUnit3Task2Sim()" class="btn-action px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">▶ 4. 開始觀察實驗</button>
-                ${task2.observed ? `<button onclick="goUnit3Quiz()" class="btn-action px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow">下一步：破除迷思問答挑戰 →</button>` : ''}
-              </div>
-              ${task2.resultText ? `<div class="p-4 rounded-xl bg-emerald-50 border border-emerald-300 text-sm font-bold text-emerald-900">5. 比較與修正結果：${task2.resultText}</div>` : ''}
-            </div>
-          ` : ''}
-
-          ${step === 'quiz' ? `
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <h2 class="text-lg font-black text-slate-900">挑戰：破除迷思問答</h2>
-                  <p class="text-sm text-slate-600">請針對企劃書第 9 頁列出的 5 項常見力學迷思進行判斷（是 / 否）。</p>
-                </div>
-                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">已結合知識文件《摩擦力與動物爬樹的秘密》解析</span>
-              </div>
-              <div class="space-y-3">
-                ${renderMisconceptionRow('m1', '1. 運動方向等於受力方向？', quizAnswers.m1)}
-                ${renderMisconceptionRow('m2', '2. 只有運動物體才受摩擦力？', quizAnswers.m2)}
-                ${renderMisconceptionRow('m3', '3. 光滑面完全沒有摩擦力？', quizAnswers.m3)}
-                ${renderMisconceptionRow('m4', '4. 施力越大摩擦力就越大？', quizAnswers.m4)}
-                ${renderMisconceptionRow('m5', '5. 摩擦力永遠與運動方向相反？', quizAnswers.m5)}
-              </div>
-              ${quizFeedback ? `
-                <div class="p-4 rounded-xl border-2 ${quizFeedback.ok ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-amber-50 border-amber-400 text-amber-900'} text-sm space-y-2">
-                  <p class="font-black">${quizFeedback.message}</p>
-                  <div class="text-xs bg-white/90 p-3.5 rounded-lg border border-amber-200 text-slate-700 space-y-2 leading-relaxed">
-                    <p class="font-black text-slate-900">動態受力圖與知識文件解析（5 題皆為迷思，答案皆為「否」）：</p>
-                    <div class="space-y-1">
-                      <p>• <strong>迷思 1（運動方向 ≠ 受力方向）：</strong>物體常同時受到多個不同方向的力作用，因此「移動的方向」不一定等於「受力的方向」：</p>
-                      <ul class="list-disc pl-5 space-y-0.5 text-slate-700">
-                        <li><strong>向右滑行的木塊：</strong>運動方向<strong>向右（→）</strong>，但同時受到<strong>向下（↓）</strong>的地球引力、<strong>向上（↑）</strong>的支撐力，以及<strong>向左（←）</strong>阻礙滑動的摩擦力。</li>
-                        <li><strong>向上拋出的球：</strong>球正在<strong>向上（↑）</strong>飛行時，受到的地球引力方向卻是<strong>向下（↓）</strong>，因此球會逐漸減速並落回地面。</li>
-                      </ul>
-                    </div>
-                    <p>• <strong>迷思 2：</strong>靜止物體也受摩擦力！如動物抱住樹幹靜止、或吸管傾斜「卡住」繩子停留時，皆靠摩擦力平衡地球引力而不下滑。</p>
-                    <p>• <strong>迷思 3：</strong>PP板、電線桿只是表面「較光滑、摩擦力較小」，並非完全沒有摩擦力。</p>
-                    <p>• <strong>迷思 4：</strong>摩擦力大小主要受「物質表面結構與性質（如砂紙 vs PP板、棉線 vs 釣魚線）」影響，不會隨施力無限變大（【備註】最大靜摩擦力公式細節，知識文件未載明，待確認）。</p>
-                    <p>• <strong>迷思 5：</strong>在「動物爬樹」情境中，穿山甲抓樹幹與吸管卡住棉線產生的摩擦力，正是幫助小動物「向上爬升」的關鍵力量！</p>
-                  </div>
-                </div>
-              ` : ''}
-              <div class="flex flex-wrap justify-between gap-3 pt-2">
-                <button onclick="appState.u3.step='task2'; renderApp();" class="btn-action px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">← 回去觀察變因實驗</button>
-                <button onclick="checkUnit3Quiz()" class="btn-action px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow">提交迷思問答</button>
-              </div>
-            </div>
-          ` : ''}
-
-          ${step === 'summary' ? `
-            <div class="bg-white rounded-2xl p-6 border-2 border-emerald-400 space-y-5">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black">✓</div>
-                <div>
-                  <h2 class="text-lg font-black text-emerald-800">挑戰成功！已記錄「動手操作」完成</h2>
-                  <p class="text-xs text-slate-600">您已完成受力標示、變因實驗與迷思挑戰。</p>
-                </div>
-              </div>
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm space-y-1.5">
-                <p class="font-black text-slate-900">概念總結：</p>
-                <p>• 透過動態箭頭可清楚辨識重力、推力與摩擦力的方向。</p>
-                <p>• 比較施力（gw）與接觸面摩擦阻力（gw）的大小，能預測物體會前進或保持靜止。</p>
-              </div>
-              <div class="flex flex-wrap justify-end gap-3">
-                <button onclick="navigateTo('home')" class="btn-action px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow">返回首頁檢查總進度 →</button>
-              </div>
-            </div>
-          ` : ''}
+      return `<div class="space-y-5">
+        <div class="bg-emerald-600 text-white rounded-2xl p-5 shadow-sm flex flex-wrap items-center justify-between gap-3">
+          <div><span class="text-xs font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-lg">階段三：互動遊戲</span><h1 class="text-xl sm:text-2xl font-black mt-1">三、動手操作（力在哪裡 & 與力互動）</h1></div>
+          <button type="button" onclick="navigateTo('home')" class="btn-action px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-sm font-bold">← 返回首頁</button>
         </div>
-      `;
-    }
-
-    function renderTask1Select(dirKey, title, val) {
-      return `
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-          <label class="block text-xs font-black text-slate-800">${title}</label>
-          <select onchange="appState.u3.task1Selections['${dirKey}']=this.value" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-500">
-            <option value="" ${val === '' ? 'selected' : ''}>-- 請選擇力名稱 --</option>
-            <option value="gravity" ${val === 'gravity' ? 'selected' : ''}>地球引力／重力（非接觸力）</option>
-            <option value="friction" ${val === 'friction' ? 'selected' : ''}>摩擦力（接觸力）</option>
-            <option value="push" ${val === 'push' ? 'selected' : ''}>推力／施力（接觸力）</option>
-            <option value="tbd_up" ${val === 'tbd_up' ? 'selected' : ''}>向上平衡支撐力【正向力名稱待確認】</option>
-          </select>
+        <div class="grid grid-cols-3 gap-2 bg-white p-2 rounded-2xl border border-slate-200 text-xs sm:text-sm font-black text-center">
+          <div class="py-2 px-2 rounded-xl ${step==='task1'?'bg-emerald-600 text-white':appState.history.u3Task1Done?'bg-emerald-100 text-emerald-800':'text-slate-500'}">任務1：力在哪裡</div>
+          <div class="py-2 px-2 rounded-xl ${step==='task2'?'bg-emerald-600 text-white':appState.history.u3Task2Done?'bg-emerald-100 text-emerald-800':'text-slate-500'}">任務2：與力互動</div>
+          <div class="py-2 px-2 rounded-xl ${step==='quiz'||step==='summary'?'bg-emerald-600 text-white':'text-slate-500'}">挑戰：破除迷思</div>
         </div>
-      `;
+        ${step === 'task1' ? `<div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
+          <div><h2 class="text-lg font-black text-slate-900">任務 1：力在哪裡？（標示木塊受力方向）</h2><p class="text-sm text-slate-600">情境：人從左側<strong>向右推木塊</strong>，木塊在地板上向右滑動。請為四個方向箭頭選擇正確的力名稱！</p></div>
+          <div class="bg-emerald-50/70 rounded-2xl p-4 border border-emerald-200 flex flex-col items-center">
+            <svg class="w-72 h-52" viewBox="0 0 300 210" fill="none">
+              <rect x="20" y="165" width="260" height="16" rx="4" fill="#CBD5E1"/><rect x="115" y="95" width="70" height="50" rx="8" fill="#3B82F6"/><text x="150" y="125" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="bold">木塊</text>
+              <line x1="150" y1="95" x2="150" y2="38" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><polyline points="142,46 150,36 158,46" stroke="#EF4444" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="150" y="25" text-anchor="middle" fill="#B91C1C" font-size="12" font-weight="bold">↑ 向上箭頭</text>
+              <line x1="150" y1="145" x2="150" y2="195" stroke="#0F172A" stroke-width="4" stroke-linecap="round"/><polyline points="142,187 150,197 158,187" stroke="#0F172A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="210" y="198" text-anchor="middle" fill="#0F172A" font-size="12" font-weight="bold">↓ 向下箭頭</text>
+              <line x1="185" y1="120" x2="255" y2="120" stroke="#0284C7" stroke-width="4" stroke-linecap="round"/><polyline points="247,112 257,120 247,128" stroke="#0284C7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="245" y="102" text-anchor="middle" fill="#0369A1" font-size="12" font-weight="bold">→ 向右箭頭</text>
+              <line x1="115" y1="120" x2="45" y2="120" stroke="#16A34A" stroke-width="4" stroke-linecap="round"/><polyline points="53,112 43,120 53,128" stroke="#16A34A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="55" y="102" text-anchor="middle" fill="#15803D" font-size="12" font-weight="bold">← 向左箭頭</text>
+            </svg>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            ${[['down','↓ 向下箭頭（指向地球）'],['left','← 向左箭頭（與滑行方向相反）'],['right','→ 向右箭頭（人向右推木塊）'],['up','↑ 向上箭頭（企劃書圖示）']].map(([k,t]) => `<div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2"><label class="block text-xs font-black text-slate-800">${t}</label><select onchange="appState.u3.task1Selections['${k}']=this.value" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-900"><option value="" ${task1Selections[k]===''?'selected':''}>-- 請選擇力名稱 --</option><option value="gravity" ${task1Selections[k]==='gravity'?'selected':''}>地球引力／重力（非接觸力）</option><option value="friction" ${task1Selections[k]==='friction'?'selected':''}>摩擦力（接觸力）</option><option value="push" ${task1Selections[k]==='push'?'selected':''}>推力／施力（接觸力）</option><option value="tbd_up" ${task1Selections[k]==='tbd_up'?'selected':''}>向上平衡支撐力【正向力名稱待確認】</option></select></div>`).join('')}
+          </div>
+          ${task1Feedback ? `<div class="p-4 rounded-xl border-2 ${task1Feedback.ok ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-amber-50 border-amber-400 text-amber-900'} text-sm font-bold">${task1Feedback.message}</div>` : ''}
+          <div class="flex justify-end"><button type="button" onclick="checkUnit3Task1()" class="btn-action px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow">驗證受力標示 →</button></div>
+        </div>` : ''}
+        ${step === 'task2' ? `<div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
+          <div><h2 class="text-lg font-black text-slate-900">任務 2：與力互動（預測 → 觀察 → 比較 → 修正）</h2><p class="text-sm text-slate-600">請先調整下方的「施力大小（<strong>gw 公克重</strong>）」與「接觸面材質」，選擇預測後再啟動實驗！</p></div>
+          <div class="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-200 space-y-4">
+            <div class="flex flex-wrap items-center gap-2"><span class="text-xs font-black text-slate-700">1. 選擇接觸面材質：</span>
+              <button type="button" onclick="appState.u3.task2.frictionResistance=20; appState.u3.task2.materialName='PP板（光滑）'; renderApp();" class="btn-action px-3 py-1.5 rounded-xl text-xs font-black border ${task2.frictionResistance===20?'bg-emerald-600 text-white border-emerald-700':'bg-white text-slate-700 border-slate-300'}">PP板（阻力 20 gw）</button>
+              <button type="button" onclick="appState.u3.task2.frictionResistance=50; appState.u3.task2.materialName='抹布（中等粗糙）'; renderApp();" class="btn-action px-3 py-1.5 rounded-xl text-xs font-black border ${task2.frictionResistance===50?'bg-emerald-600 text-white border-emerald-700':'bg-white text-slate-700 border-slate-300'}">抹布（阻力 50 gw）</button>
+              <button type="button" onclick="appState.u3.task2.frictionResistance=85; appState.u3.task2.materialName='砂紙（非常粗糙）'; renderApp();" class="btn-action px-3 py-1.5 rounded-xl text-xs font-black border ${task2.frictionResistance===85?'bg-emerald-600 text-white border-emerald-700':'bg-white text-slate-700 border-slate-300'}">砂紙（阻力 85 gw）</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><div class="flex justify-between text-sm font-black text-slate-800 mb-1"><span>2. 施力大小（推力／拉力）</span><span id="u3-force-val" class="text-sky-700">${task2.force} gw（公克重）</span></div><input type="range" min="10" max="100" value="${task2.force}" oninput="updateU3Force(this.value)" class="w-full accent-sky-600 cursor-pointer h-3" /></div>
+              <div><div class="flex justify-between text-sm font-black text-slate-800 mb-1"><span>接觸面摩擦阻力</span><span id="u3-rough-val" class="text-emerald-700">${task2.frictionResistance} gw（${task2.materialName}）</span></div><input type="range" min="10" max="100" value="${task2.frictionResistance}" oninput="updateU3Resistance(this.value)" class="w-full accent-emerald-600 cursor-pointer h-3" /></div>
+            </div>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <p id="u3-pred-prompt" class="text-sm font-black text-slate-900">3. 預測：目前施力 <strong>${task2.force} gw</strong>、摩擦阻力 <strong>${task2.frictionResistance} gw</strong>，木塊會如何運動？</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              ${[['fast','施力大於阻力：加速前進'],['slow','阻力大於施力：推不動（靜止）'],['equal','施力與阻力相近：緩慢移動']].map(([v,l]) => `<button type="button" onclick="appState.u3.task2.prediction='${v}'; renderApp();" class="btn-action p-2.5 rounded-xl text-xs font-black border ${task2.prediction===v?'bg-emerald-600 text-white border-emerald-700 shadow':'bg-white text-slate-700 border-slate-300'}">${l}</button>`).join('')}
+            </div>
+          </div>
+          <div id="u3-canvas-wrap" class="w-full h-48 rounded-2xl bg-sky-50 border-2 border-emerald-200 overflow-hidden"><canvas id="u3-canvas" class="w-full h-full block"></canvas></div>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <button type="button" onclick="runUnit3Task2Sim()" class="btn-action px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-sm shadow">▶ 4. 開始觀察實驗</button>
+            ${task2.observed ? `<button type="button" onclick="stopCanvasAnim(); appState.u3.step='quiz'; renderApp();" class="btn-action px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow">下一步：破除迷思問答挑戰 →</button>` : ''}
+          </div>
+          ${task2.resultText ? `<div class="p-4 rounded-xl bg-emerald-50 border border-emerald-300 text-sm font-bold text-emerald-900">5. 比較與修正結果：${task2.resultText}</div>` : ''}
+        </div>` : ''}
+        ${step === 'quiz' ? `<div class="bg-white rounded-2xl p-6 border border-slate-200 space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2"><div><h2 class="text-lg font-black text-slate-900">挑戰：破除迷思問答</h2><p class="text-sm text-slate-600">請針對企劃書第 9 頁列出的 5 項常見力學迷思進行判斷（是 / 否）。</p></div><span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">已結合知識文件《摩擦力與動物爬樹的秘密》解析</span></div>
+          <div class="space-y-3">
+            ${[['m1','1. 運動方向等於受力方向？'],['m2','2. 只有運動物體才受摩擦力？'],['m3','3. 光滑面完全沒有摩擦力？'],['m4','4. 施力越大摩擦力就越大？'],['m5','5. 摩擦力永遠與運動方向相反？']].map(([k,q]) => `<div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2"><span class="font-bold text-sm text-slate-900">${q}</span><div class="flex gap-2 shrink-0"><button type="button" onclick="appState.u3.quizAnswers['${k}']='yes'; renderApp();" class="btn-action px-4 py-1.5 rounded-xl text-xs font-black border ${quizAnswers[k]==='yes'?'bg-rose-500 text-white border-rose-600':'bg-white text-slate-700 border-slate-300'}">是（正確觀念）</button><button type="button" onclick="appState.u3.quizAnswers['${k}']='no'; renderApp();" class="btn-action px-4 py-1.5 rounded-xl text-xs font-black border ${quizAnswers[k]==='no'?'bg-emerald-600 text-white border-emerald-700':'bg-white text-slate-700 border-slate-300'}">否（這是迷思）</button></div></div>`).join('')}
+          </div>
+          ${quizFeedback ? `<div class="p-4 rounded-xl border-2 ${quizFeedback.ok ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-amber-50 border-amber-400 text-amber-900'} text-sm space-y-2"><p class="font-black">${quizFeedback.message}</p><div class="text-xs bg-white/90 p-3.5 rounded-lg border border-amber-200 text-slate-700 space-y-1.5"><p class="font-black text-slate-900">解析（5 題皆為迷思，答案皆為「否」）：</p><p>• 迷思 1：物體常同時受多個不同方向的力（如向右滑行木塊受向下重力、向上支撐力、向左摩擦力）。</p><p>• 迷思 2～5：靜止物體亦受摩擦力（動物抱樹幹）；光滑面只是摩擦力較小；摩擦力主要受表面性質影響；爬樹時摩擦力幫助向上爬升。</p></div></div>` : ''}
+          <div class="flex flex-wrap justify-between gap-3 pt-2">
+            <button type="button" onclick="appState.u3.step='task2'; renderApp();" class="btn-action px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">← 回去觀察變因實驗</button>
+            <button type="button" onclick="checkUnit3Quiz()" class="btn-action px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow">提交迷思問答</button>
+          </div>
+        </div>` : ''}
+        ${step === 'summary' ? `<div class="bg-white rounded-2xl p-6 border-2 border-emerald-400 space-y-5">
+          <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black">✓</div><div><h2 class="text-lg font-black text-emerald-800">挑戰成功！已記錄「動手操作」完成</h2><p class="text-xs text-slate-600">您已完成受力標示、變因實驗與迷思挑戰。</p></div></div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm space-y-1.5"><p class="font-black text-slate-900">概念總結：</p><p>• 透過動態箭頭可清楚辨識重力、推力與摩擦力的方向。</p><p>• 比較施力（gw）與接觸面摩擦阻力（gw）的大小，能預測物體會前進或保持靜止。</p></div>
+          <div class="flex flex-wrap justify-end gap-3"><button type="button" onclick="navigateTo('home')" class="btn-action px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow">返回首頁檢查總進度 →</button></div>
+        </div>` : ''}
+      </div>`;
     }
 
     function checkUnit3Task1() {
       const s = appState.u3.task1Selections;
-      if (!s.down || !s.left || !s.right || !s.up) {
-        appState.u3.task1Feedback = { ok: false, message: '請先為四個方向箭頭都選擇對應名稱！' }; renderApp(); return;
-      }
-      if (s.down === 'gravity' && s.left === 'friction' && s.right === 'push' && s.up === 'tbd_up') {
-        appState.history.u3Task1Done = true; appState.u3.step = 'task2'; renderApp();
-      } else {
-        appState.u3.task1Feedback = { ok: false, message: '受力圖引導：地球引力（重力）向下作用（↓）；人向右推故施力向右（→）；摩擦力與滑行方向相反故向左（←）；向上箭頭請選「向上平衡支撐力【正向力名稱待確認】」。' };
-        renderApp();
-      }
+      if (!s.down || !s.left || !s.right || !s.up) { appState.u3.task1Feedback = { ok: false, message: '請先為四個方向箭頭都選擇對應名稱！' }; renderApp(); return; }
+      if (s.down === 'gravity' && s.left === 'friction' && s.right === 'push' && s.up === 'tbd_up') { appState.history.u3Task1Done = true; appState.u3.step = 'task2'; renderApp(); }
+      else { appState.u3.task1Feedback = { ok: false, message: '受力圖引導：地球引力向下（↓）；人向右推故施力向右（→）；摩擦力與滑行方向相反故向左（←）；向上箭頭請選「向上平衡支撐力【正向力名稱待確認】」。' }; renderApp(); }
     }
 
-    function setU3Material(val, name) { appState.u3.task2.frictionResistance = val; appState.u3.task2.materialName = name; renderApp(); }
     function updateU3Force(val) {
       appState.u3.task2.force = Number(val);
-      const lbl = document.getElementById('u3-force-val');
-      if (lbl) lbl.textContent = `${val} gw（公克重）`;
-      const prompt = document.getElementById('u3-pred-prompt');
-      if (prompt) prompt.innerHTML = `3. 預測：目前施力 <strong>${val} gw</strong>、摩擦阻力 <strong>${appState.u3.task2.frictionResistance} gw</strong>，木塊會如何運動？`;
+      const lbl = document.getElementById('u3-force-val'); if (lbl) lbl.textContent = `${val} gw（公克重）`;
+      const p = document.getElementById('u3-pred-prompt'); if (p) p.innerHTML = `3. 預測：目前施力 <strong>${val} gw</strong>、摩擦阻力 <strong>${appState.u3.task2.frictionResistance} gw</strong>，木塊會如何運動？`;
     }
     function updateU3Resistance(val) {
       const r = Number(val); appState.u3.task2.frictionResistance = r;
       const mat = r < 35 ? '接近 PP板（光滑）' : r > 65 ? '接近砂紙（粗糙）' : '接近抹布（中等）';
       appState.u3.task2.materialName = mat;
-      const lbl = document.getElementById('u3-rough-val');
-      if (lbl) lbl.textContent = `${r} gw（${mat}）`;
-      const prompt = document.getElementById('u3-pred-prompt');
-      if (prompt) prompt.innerHTML = `3. 預測：目前施力 <strong>${appState.u3.task2.force} gw</strong>、摩擦阻力 <strong>${r} gw</strong>，木塊會如何運動？`;
-    }
-
-    function renderPredBtn(val, label, current) {
-      const active = current === val;
-      return `<button onclick="appState.u3.task2.prediction='${val}'; renderApp();" class="btn-action p-2.5 rounded-xl text-xs font-black border ${active ? 'bg-emerald-600 text-white border-emerald-700 shadow' : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50'}">${label}</button>`;
+      const lbl = document.getElementById('u3-rough-val'); if (lbl) lbl.textContent = `${r} gw（${mat}）`;
+      const p = document.getElementById('u3-pred-prompt'); if (p) p.innerHTML = `3. 預測：目前施力 <strong>${appState.u3.task2.force} gw</strong>、摩擦阻力 <strong>${r} gw</strong>，木塊會如何運動？`;
     }
 
     let u3SimState = { x: 40, vx: 0, running: false };
     function initUnit3Task2Canvas() {
-      const canvas = document.getElementById('u3-canvas');
-      const wrap = document.getElementById('u3-canvas-wrap');
-      if (!canvas || !wrap) return;
-      const ctx = canvas.getContext('2d');
-      function resize() { canvas.width = wrap.clientWidth; canvas.height = wrap.clientHeight; }
-      resize();
+      const canvas = document.getElementById('u3-canvas'), wrap = document.getElementById('u3-canvas-wrap');
+      if (!canvas || !wrap) return; const ctx = canvas.getContext('2d');
+      canvas.width = wrap.clientWidth; canvas.height = wrap.clientHeight;
       function loop() {
         if (appState.currentView !== 'unit3' || appState.u3.step !== 'task2') return;
         const w = canvas.width, h = canvas.height, floorY = h - 36, { force, frictionResistance } = appState.u3.task2;
@@ -861,20 +455,17 @@
           const net = force - frictionResistance;
           if (net > 5) { u3SimState.vx = Math.min(6, u3SimState.vx + net * 0.004); u3SimState.x += u3SimState.vx; }
           else if (net >= -5) { u3SimState.vx = 1.2; u3SimState.x += u3SimState.vx; }
-          else { u3SimState.vx = 0; }
+          else u3SimState.vx = 0;
           if (u3SimState.x > w - 90) { u3SimState.x = w - 90; u3SimState.running = false; }
         }
-        ctx.clearRect(0, 0, w, h);
-        ctx.fillStyle = '#CBD5E1'; ctx.fillRect(0, floorY, w, h - floorY);
+        ctx.clearRect(0, 0, w, h); ctx.fillStyle = '#CBD5E1'; ctx.fillRect(0, floorY, w, h - floorY);
         const bx = u3SimState.x, by = floorY - 42;
         ctx.fillStyle = '#059669'; ctx.beginPath(); ctx.roundRect(bx, by, 64, 42, 8); ctx.fill();
         ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 12px "Noto Sans TC", sans-serif'; ctx.fillText('木塊', bx + 19, by + 25);
-
         const fLen = 20 + force * 0.6, rLen = 20 + frictionResistance * 0.6;
         ctx.strokeStyle = '#0284C7'; ctx.fillStyle = '#0369A1'; ctx.lineWidth = 4;
         ctx.beginPath(); ctx.moveTo(bx + 64, by + 21); ctx.lineTo(bx + 64 + fLen, by + 21); ctx.stroke();
         ctx.font = 'bold 11px "Noto Sans TC", sans-serif'; ctx.fillText(`施力 ${force} gw →`, bx + 68, by + 12);
-
         ctx.strokeStyle = '#DC2626'; ctx.fillStyle = '#B91C1C';
         ctx.beginPath(); ctx.moveTo(bx, by + 21); ctx.lineTo(Math.max(8, bx - rLen), by + 21); ctx.stroke();
         ctx.fillText(`← 阻力 ${frictionResistance} gw`, Math.max(8, bx - rLen), by + 12);
@@ -887,101 +478,40 @@
       const t2 = appState.u3.task2;
       if (!t2.prediction) { t2.resultText = '請先點選上方的「3. 預測」選項，再按開始觀察！'; renderApp(); return; }
       u3SimState = { x: 40, vx: 0, running: true }; t2.observed = true; appState.history.u3Task2Done = true;
-      const diff = t2.force - t2.frictionResistance;
-      const actual = diff > 5 ? 'fast' : diff >= -5 ? 'equal' : 'slow';
-      const actualDesc = diff > 5 ? `施力（${t2.force} gw）大於接觸面摩擦阻力（${t2.frictionResistance} gw），木塊明顯向右加速前進！`
-        : diff >= -5 ? `施力（${t2.force} gw）與摩擦阻力（${t2.frictionResistance} gw）相近，木塊緩慢移動。`
-        : `接觸面摩擦阻力（${t2.frictionResistance} gw）大於施力（${t2.force} gw），木塊推不動（保持靜止）！`;
-      t2.resultText = (t2.prediction === actual) ? `預測完全符合觀察！${actualDesc}` : `觀察與預測不同，已完成比較與修正：實際結果為「${actualDesc}」`;
+      const diff = t2.force - t2.frictionResistance, actual = diff > 5 ? 'fast' : diff >= -5 ? 'equal' : 'slow';
+      const desc = diff > 5 ? `施力（${t2.force} gw）大於摩擦阻力（${t2.frictionResistance} gw），木塊明顯向右加速前進！` : diff >= -5 ? `施力（${t2.force} gw）與阻力（${t2.frictionResistance} gw）相近，木塊緩慢移動。` : `摩擦阻力（${t2.frictionResistance} gw）大於施力（${t2.force} gw），木塊推不動（保持靜止）！`;
+      t2.resultText = t2.prediction === actual ? `預測完全符合觀察！${desc}` : `觀察與預測不同，已完成比較與修正：實際結果為「${desc}」`;
       renderApp();
-    }
-
-    function goUnit3Quiz() { stopCanvasAnim(); appState.u3.step = 'quiz'; renderApp(); }
-
-    function renderMisconceptionRow(key, question, val) {
-      return `
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <span class="font-bold text-sm text-slate-900">${question}</span>
-          <div class="flex gap-2 shrink-0">
-            <button onclick="appState.u3.quizAnswers['${key}']='yes'; renderApp();" class="btn-action px-4 py-1.5 rounded-xl text-xs font-black border ${val === 'yes' ? 'bg-rose-500 text-white border-rose-600' : 'bg-white text-slate-700 border-slate-300'}">是（正確觀念）</button>
-            <button onclick="appState.u3.quizAnswers['${key}']='no'; renderApp();" class="btn-action px-4 py-1.5 rounded-xl text-xs font-black border ${val === 'no' ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-white text-slate-700 border-slate-300'}">否（這是迷思）</button>
-          </div>
-        </div>
-      `;
     }
 
     function checkUnit3Quiz() {
       const q = appState.u3.quizAnswers;
-      if (!q.m1 || !q.m2 || !q.m3 || !q.m4 || !q.m5) {
-        appState.u3.quizFeedback = { ok: false, message: '請先完成全部 5 題迷思問答的作答！' }; renderApp(); return;
-      }
+      if (!q.m1 || !q.m2 || !q.m3 || !q.m4 || !q.m5) { appState.u3.quizFeedback = { ok: false, message: '請先完成全部 5 題迷思問答的作答！' }; renderApp(); return; }
       appState.history.u3QuizAttempts += 1;
-      if (q.m1 === 'no' && q.m2 === 'no' && q.m3 === 'no' && q.m4 === 'no' && q.m5 === 'no') {
-        appState.completed.unit3 = true; updateTopBadges(); appState.u3.step = 'summary'; renderApp();
-      } else {
-        appState.u3.quizFeedback = { ok: false, message: '還有題目未破除迷思喔！提示：企劃書第 9 頁列出的這 5 句話都是常見的「錯誤概念」，請將它們全部選為「否（這是迷思）」。' };
-        renderApp();
-      }
+      if (q.m1 === 'no' && q.m2 === 'no' && q.m3 === 'no' && q.m4 === 'no' && q.m5 === 'no') { appState.completed.unit3 = true; updateTopBadges(); appState.u3.step = 'summary'; renderApp(); }
+      else { appState.u3.quizFeedback = { ok: false, message: '還有題目未破除迷思喔！提示：企劃書第 9 頁列出的這 5 句話都是常見的「錯誤概念」，請全部選為「否（這是迷思）」。' }; renderApp(); }
     }
 
     function renderResultView() {
       const h = appState.history;
-      return `
-        <div class="bg-white rounded-3xl p-6 sm:p-10 border-2 border-amber-400 shadow-lg text-center space-y-6">
-          <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-amber-100 text-amber-900 text-xs font-black">三個單元皆已完成 • 學習歷程彙整</div>
-          <div class="flex justify-center">
-            <div class="w-36 h-36 rounded-full bg-gradient-to-b from-amber-300 to-amber-500 p-2 shadow-xl flex items-center justify-center animate-float">
-              <div class="w-full h-full rounded-full bg-white flex flex-col items-center justify-center border-4 border-amber-400">
-                <span class="text-4xl">🏆</span><span class="text-sm font-black text-amber-800 mt-1">力學小達人</span>
-              </div>
-            </div>
-          </div>
-          <div class="space-y-2">
-            <h1 class="text-2xl sm:text-3xl font-black text-slate-900">恭喜獲得「力學小達人」勳章！</h1>
-            <p class="text-sm text-slate-600">您已完成《神奇的力》全部互動學習單元與迷思挑戰。</p>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left max-w-3xl mx-auto">
-            <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200">
-              <p class="text-xs font-bold text-rose-700">單元一：力的種類介紹</p>
-              <p class="text-lg font-black text-slate-900 mt-1">✓ 通過分類測試</p>
-              <p class="text-xs text-slate-600 mt-1">測試作答次數：${h.u1Attempts} 次</p>
-            </div>
-            <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200">
-              <p class="text-xs font-bold text-sky-700">單元二：摩擦力登場</p>
-              <p class="text-lg font-black text-slate-900 mt-1">✓ 通過方向挑戰</p>
-              <p class="text-xs text-slate-600 mt-1">方向挑戰次數：${h.u2Attempts} 次</p>
-            </div>
-            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
-              <p class="text-xs font-bold text-emerald-700">單元三：動手操作</p>
-              <p class="text-lg font-black text-slate-900 mt-1">✓ 完成全數任務</p>
-              <p class="text-xs text-slate-600 mt-1">迷思問答次數：${h.u3QuizAttempts} 次</p>
-            </div>
-          </div>
-          <div class="pt-4 flex flex-wrap justify-center gap-3">
-            <button onclick="navigateTo('home')" class="btn-action px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-black text-sm">返回首頁</button>
-            <button onclick="resetAllProgress()" class="btn-action px-6 py-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-sm">重新體驗系統</button>
-          </div>
+      return `<div class="bg-white rounded-3xl p-6 sm:p-10 border-2 border-amber-400 shadow-lg text-center space-y-6">
+        <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-amber-100 text-amber-900 text-xs font-black">三個單元皆已完成 • 學習歷程彙整</div>
+        <div class="flex justify-center"><div class="w-36 h-36 rounded-full bg-gradient-to-b from-amber-300 to-amber-500 p-2 shadow-xl flex items-center justify-center animate-float"><div class="w-full h-full rounded-full bg-white flex flex-col items-center justify-center border-4 border-amber-400"><span class="text-4xl">🏆</span><span class="text-sm font-black text-amber-800 mt-1">力學小達人</span></div></div></div>
+        <div class="space-y-2"><h1 class="text-2xl sm:text-3xl font-black text-slate-900">恭喜獲得「力學小達人」勳章！</h1><p class="text-sm text-slate-600">您已完成《神奇的力》全部互動學習單元與迷思挑戰。</p></div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left max-w-3xl mx-auto">
+          <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200"><p class="text-xs font-bold text-rose-700">單元一：力的種類介紹</p><p class="text-lg font-black text-slate-900 mt-1">✓ 通過分類測試</p><p class="text-xs text-slate-600 mt-1">測試作答次數：${h.u1Attempts} 次</p></div>
+          <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200"><p class="text-xs font-bold text-sky-700">單元二：摩擦力登場</p><p class="text-lg font-black text-slate-900 mt-1">✓ 通過方向挑戰</p><p class="text-xs text-slate-600 mt-1">方向挑戰次數：${h.u2Attempts} 次</p></div>
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200"><p class="text-xs font-bold text-emerald-700">單元三：動手操作</p><p class="text-lg font-black text-slate-900 mt-1">✓ 完成全數任務</p><p class="text-xs text-slate-600 mt-1">迷思問答次數：${h.u3QuizAttempts} 次</p></div>
         </div>
-      `;
+        <div class="pt-4 flex flex-wrap justify-center gap-3">
+          <button type="button" onclick="navigateTo('home')" class="btn-action px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-black text-sm">返回首頁</button>
+          <button type="button" onclick="appState.completed={unit1:false,unit2:false,unit3:false}; navigateTo('home');" class="btn-action px-6 py-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-sm">重新體驗系統</button>
+        </div>
+      </div>`;
     }
 
-    function resetAllProgress() {
-      appState.completed = { unit1: false, unit2: false, unit3: false };
-      appState.history = { u1Attempts: 0, u2Attempts: 0, u3Task1Done: false, u3Task2Done: false, u3QuizAttempts: 0 };
-      appState.u1 = { step: 'intro', answers: { spring: '', friction: '', magnet: '', gravity: '' }, feedback: null };
-      appState.u2 = { step: 'concept', frictionResistance: 50, materialName: '抹布（中等粗糙）', selectedDir: '', feedback: null };
-      appState.u3 = {
-        step: 'task1', task1Selections: { down: '', left: '', right: '', up: '' }, task1Feedback: null,
-        task2: { prediction: '', force: 60, frictionResistance: 20, materialName: 'PP板（光滑）', observed: false, resultText: '' },
-        quizAnswers: {}, quizFeedback: null
-      };
-      navigateTo('home');
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      updateTopBadges();
-      renderApp();
-    });
+    updateTopBadges();
+    renderApp();
   </script>
 </body>
 </html>
